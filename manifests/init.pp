@@ -26,8 +26,13 @@ class opendaylight (
 ) inherits ::opendaylight::params {
 
   # Validate OS family
-  if $::osfamily != 'RedHat' {
-    fail("Unsupported OS family: ${::osfamily}")
+  case $::osfamily {
+    Debian: {
+        warn("Debian is alpha version")
+    }
+    default: {
+        fail("Unsupported OS family: ${::osfamily}")
+    }
   }
 
   # Validate OS
@@ -44,6 +49,11 @@ class opendaylight (
         fail("Unsupported OS: ${::operatingsystem} ${::operatingsystemmajrelease}")
       }
     }
+    Ubuntu: {
+      if $::operatingsystemmajrelease != '14.04' {
+        # Only tested on 14.04
+        fail("Unsupported OS: ${::operatingsystem} ${::operatingsystemmajrelease}")
+      }
     default: {
       fail("Unsupported OS: ${::operatingsystem}")
     }
