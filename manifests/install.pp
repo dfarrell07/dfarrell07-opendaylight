@@ -55,14 +55,14 @@ class opendaylight::install {
       # The odl user's home dir should exist before it's created
       # The odl group, to which the odl user will below, should exist
       require    => [Archive["${odl_target_name}"], Group['odl']],
-      before     => File["/opt/${odl_target_name}"],
+      before     => File["/opt/${odl_top_folder}"],
     }
 
     # Create and configure the `odl` group
     group { 'odl':
       ensure => present,
       # The `odl` user will be a member of this group, create it first
-      before => [File["/opt/${odl_target_name}"], User['odl']],
+      before => [File["/opt/${odl_top_folder}"], User['odl']],
     }
 
     # Download and extract the ODL tarball
@@ -81,7 +81,7 @@ class opendaylight::install {
       timeout          => 600,
       # The odl user will set this to their home dir, should exist
       #~ before           => [File['/opt/opendaylight-0.2.2/'], User['odl']],
-      before              => File["/opt/${odl_top_folder}"], User['odl']],
+      before              => [File["/opt/${odl_top_folder}"], User['odl']],
     }
     
     # Because camp2camp/puppet-archive does not manage strip-components,
@@ -92,34 +92,6 @@ class opendaylight::install {
         before           => [File["/opt/${odl_top_folder}"], User['odl']],
     }
 
-    
-    # Download ODL systemd .service file and put in right location
-    archive { 'opendaylight-systemd':
-      ensure           => present,
-      url              => $opendaylight::unitfile_url,
-      # Will end up installing /usr/lib/systemd/system/opendaylight.service
-      target           => '/usr/lib/systemd/system/',
-      # Required by archive mod for correct exec `creates` param
-      root_dir         => 'opendaylight.service',
-      # ODL doesn't provide a checksum in the expected path, would fail
-      checksum         => false,
-      # This discards top-level dir of extracted tarball
-      # Required to get proper /opt/opendaylight-<version> path
-      #~ strip_components => 1,
-      # May end up with an HTML redirect output in a text file without this
-      # Note that the curl'd down file would still have a .tar.gz name
-      follow_redirects => true,
-      # Should exist before we try to set its user/group/mode
-      #~ before           => File['/usr/lib/systemd/system/opendaylight.service'],
-    }  
-      
-    # Because camp2camp/puppet-archive does not manage strip-components,
-    # we untar one level upper and link to the correct target
-    file { '/usr/lib/systemd/system/opendaylight.service':
-        ensure => link,
-        target => '/usr/lib/systemd/system/opendaylight-systemd-master/opendaylight.service',
-        before           => File['/usr/lib/systemd/system/opendaylight-systemd-master/opendaylight.service'],
-    }
 
     # Set the user:group owners and mode of ODL dir
     file { "/opt/${odl_top_folder}":
@@ -134,18 +106,42 @@ class opendaylight::install {
       # Should happen after archive extracted and user/group created
       require => [Archive["${odl_target_name}"], Group['odl'], User['odl']],
     }
+    
+    if ( $::osfamily == 'redhat' ){
+        # Download ODL systemd .service file and put in right location
+        archive { 'opendaylight-systemd':
+          ensure           => present,
+          url              => $opendaylight::unitfile_url,
+          # Will end up installing /usr/lib/systemd/system/opendaylight.service
+          target           => '/usr/lib/systemd/system/',
+          # Required by archive mod for correct exec `creates` param
+          root_dir         => 'opendaylight.service',
+          # ODL doesn't provide a checksum in the expected path, would fail
+          checksum         => false,
+          # This discards top-level dir of extracted tarball
+          # Required to get proper /opt/opendaylight-<version> path
+          strip_components => 1,
+          # May end up with an HTML redirect output in a text file without this
+          # Note that the curl'd down file would still have a .tar.gz name
+          follow_redirects => true,
+          # Should exist before we try to set its user/group/mode
+          before           => File['/usr/lib/systemd/system/opendaylight.service'],
+        }  
 
-    # Set the user:group owners and mode of ODL's systemd .service file
-    file { '/usr/lib/systemd/system/opendaylight-systemd-master/opendaylight.service':
-      # It should be a normal file
-      ensure  => 'file',
-      # Set user:group owners of ODL systemd .service file
-      owner   => 'root',
-      group   => 'root',
-      # Set mode of ODL systemd .service file
-      mode    => '0644',
-      # Should happen after the ODL systemd .service file has been extracted
-      require => Archive['opendaylight-systemd'],
+        # Set the user:group owners and mode of ODL's systemd .service file
+        file { '/usr/lib/systemd/system/opendaylight.service':
+          # It should be a normal file
+          ensure  => 'file',
+          # Set user:group owners of ODL systemd .service file
+          owner   => 'root',
+          group   => 'root',
+          # Set mode of ODL systemd .service file
+          mode    => '0644',
+          # Should happen after the ODL systemd .service file has been extracted
+          require => Archive['opendaylight-systemd'],
+        }
+    }else{
+        
     }
     
   }
