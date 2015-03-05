@@ -28,7 +28,7 @@ class opendaylight (
   # Validate OS family
   case $::osfamily {
     Debian: {
-        warn("Debian is alpha version")
+        warning("Debian is alpha version")
     }
     default: {
         fail("Unsupported OS family: ${::osfamily}")

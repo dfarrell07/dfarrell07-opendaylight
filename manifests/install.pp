@@ -81,7 +81,7 @@ class opendaylight::install {
       timeout          => 600,
       # The odl user will set this to their home dir, should exist
       #~ before           => [File['/opt/opendaylight-0.2.2/'], User['odl']],
-      before              => [File["/opt/${odl_top_folder}"], User['odl']],
+      before              => File["/opt/${odl_top_folder}"], User['odl']],
     }
     
     # Because camp2camp/puppet-archive does not manage strip-components,
