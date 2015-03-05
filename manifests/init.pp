@@ -54,6 +54,7 @@ class opendaylight (
         # Only tested on 14.04
         fail("Unsupported OS: ${::operatingsystem} ${::operatingsystemmajrelease}")
       }
+    }
     default: {
       fail("Unsupported OS: ${::operatingsystem}")
     }
