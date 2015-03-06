@@ -13,7 +13,7 @@ class opendaylight::config (
   # Ideally, ODL's version wouldn't be in the path, to make this more robust
   file { 'org.apache.karaf.features.cfg':
     ensure  => file,
-    path    => '/opt/opendaylight-0.2.2/etc/org.apache.karaf.features.cfg',
+    path    => "/opt/${opendaylight::odl_target_name}/etc/org.apache.karaf.features.cfg",
     content => template('opendaylight/org.apache.karaf.features.cfg.erb'),
   }
 
@@ -25,7 +25,7 @@ class opendaylight::config (
   file_line { 'tomcatport':
     ensure => present,
     # Ideally, ODL's version wouldn't be in the path, to make this more robust
-    path   => '/opt/opendaylight-0.2.2/configuration/tomcat-server.xml',
+    path   => "/opt/${opendaylight::odl_target_name}/configuration/tomcat-server.xml",
     line   => $myline,
     match  => '^\s*<Connector\s*port=\"[0-9]+\"\s*protocol=\"HTTP\/1.1\"$',
   }
