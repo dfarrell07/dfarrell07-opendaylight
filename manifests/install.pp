@@ -94,7 +94,7 @@ class opendaylight::install {
       require => [Archive[$opendaylight::odl_target_name], Group['odl'], User['odl']],
     }
     
-    if ( $::osfamily == 'redhat' ){
+    if ( $::osfamily == 'Redhat' ){
         # Download ODL systemd .service file and put in right location
         archive { 'opendaylight-systemd':
           ensure           => present,
@@ -127,8 +127,21 @@ class opendaylight::install {
           # Should happen after the ODL systemd .service file has been extracted
           require => Archive['opendaylight-systemd'],
         }
+    }
+    elsif ( $::osfamily == 'Debian' ){
+        file { '/etc/init/opendaylight':
+          # It should be a normal file
+          ensure  => 'file',
+          # Set user:group owners of ODL upstart file
+          owner   => 'root',
+          group   => 'root',
+          # Set mode of ODL upstart file
+          mode    => '0644',
+          # Get content from template
+          content => template('opendaylight/upstart.odl.conf'),
+        }
     }else{
-        
+        fail("Unsupported OS family: ${::osfamily}")
     }
     
   }
