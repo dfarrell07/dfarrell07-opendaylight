@@ -30,10 +30,7 @@ class opendaylight::install {
     }
   }
   elsif $opendaylight::install_method == 'tarball' {
-  
-    $odl_top_folder = 'distribution-karaf-0.2.2-Helium-SR2'
-    $odl_target_name = 'opendaylight-0.2.2'
-  
+    
     # Install Java 7
     $package = $::osfamily ? {
       'RedHat' => 'java-1.7.0-openjdk',
@@ -48,25 +45,25 @@ class opendaylight::install {
     user { 'odl':
       ensure     => present,
       # Must be a valid dir for the auto-creation of some files
-      home       => "/opt/${odl_target_name}",
+      home       => "/opt/${opendaylight::odl_target_name}",
       # The odl user should, at the minimum, be a member of the odl group
       membership => 'minimum',
       groups     => 'odl',
       # The odl user's home dir should exist before it's created
       # The odl group, to which the odl user will below, should exist
-      require    => [Archive["${odl_target_name}"], Group['odl']],
-      before     => File["/opt/${odl_top_folder}"],
+      require    => [Archive[$opendaylight::odl_target_name], Group['odl']],
+      before     => File["/opt/${opendaylight::odl_target_name}"],
     }
 
     # Create and configure the `odl` group
     group { 'odl':
       ensure => present,
       # The `odl` user will be a member of this group, create it first
-      before => [File["/opt/${odl_top_folder}"], User['odl']],
+      before => [File["/opt/${opendaylight::odl_target_name}"], User['odl']],
     }
 
     # Download and extract the ODL tarball
-    archive { "${odl_target_name}":
+    archive { $opendaylight::odl_target_name:
       ensure           => present,
       url              => $opendaylight::tarball_url,
       # Will end up installing /opt/opendaylight-0.2.2
@@ -75,26 +72,16 @@ class opendaylight::install {
       checksum         => false,
       # This discards top-level dir of extracted tarball
       # Required to get proper /opt/opendaylight-<version> path
-      #~ strip_components => 1,
+      strip_components => 1,
       # Default timeout is 120s, which may not be enough. See Issue #53:
       # https://github.com/dfarrell07/puppet-opendaylight/issues/53
       timeout          => 600,
       # The odl user will set this to their home dir, should exist
-      #~ before           => [File['/opt/opendaylight-0.2.2/'], User['odl']],
-      before              => [File["/opt/${odl_top_folder}"], User['odl']],
+      before              => [File["/opt/${opendaylight::odl_target_name}"], User['odl']],
     }
     
-    # Because camp2camp/puppet-archive does not manage strip-components,
-    # we untar one level upper and link to the correct target
-    file { "/opt/${odl_target_name}":
-        ensure => link,
-        target => "/opt/${odl_top_folder}",
-        before           => [File["/opt/${odl_top_folder}"], User['odl']],
-    }
-
-
     # Set the user:group owners and mode of ODL dir
-    file { "/opt/${odl_top_folder}":
+    file { "/opt/${opendaylight::odl_target_name}":
       # ensure=>dir and recurse=>true are required for managing recursively
       ensure  => 'directory',
       recurse => true,
@@ -104,7 +91,7 @@ class opendaylight::install {
       # Set mode of ODL dir
       mode    => '0775',
       # Should happen after archive extracted and user/group created
-      require => [Archive["${odl_target_name}"], Group['odl'], User['odl']],
+      require => [Archive[$opendaylight::odl_target_name], Group['odl'], User['odl']],
     }
     
     if ( $::osfamily == 'redhat' ){
