@@ -129,7 +129,7 @@ class opendaylight::install {
         }
     }
     elsif ( $::osfamily == 'Debian' ){
-        file { '/etc/init/opendaylight':
+        file { '/etc/init/opendaylight.conf':
           # It should be a normal file
           ensure  => 'file',
           # Set user:group owners of ODL upstart file
