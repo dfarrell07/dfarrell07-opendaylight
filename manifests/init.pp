@@ -28,8 +28,9 @@ class opendaylight (
   # Validate OS family
   case $::osfamily {
     Debian: {
-        warning("Debian is alpha version")
+        warning("Debian family is valid but only installable with tarball method")
     }
+    RedHat: {}
     default: {
         fail("Unsupported OS family: ${::osfamily}")
     }
