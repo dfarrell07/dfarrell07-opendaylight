@@ -77,7 +77,7 @@ class opendaylight::install {
       # https://github.com/dfarrell07/puppet-opendaylight/issues/53
       timeout          => 600,
       # The odl user will set this to their home dir, should exist
-      before              => [File["/opt/${opendaylight::odl_target_name}"], User['odl']],
+      before           => [File["/opt/${opendaylight::odl_target_name}"], User['odl']],
     }
     
     # Set the user:group owners and mode of ODL dir
@@ -94,7 +94,7 @@ class opendaylight::install {
       require => [Archive[$opendaylight::odl_target_name], Group['odl'], User['odl']],
     }
     
-    if ( $::osfamily == 'Redhat' ){
+    if ( $::osfamily == 'RedHat' ){
         # Download ODL systemd .service file and put in right location
         archive { 'opendaylight-systemd':
           ensure           => present,
