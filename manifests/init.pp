@@ -28,7 +28,7 @@ class opendaylight (
   # Validate OS family
   case $::osfamily {
     Debian: {
-        warning("Debian family is valid but only installable with tarball method")
+        warning('Debian family is valid but only installable with tarball method')
     }
     RedHat: {}
     default: {

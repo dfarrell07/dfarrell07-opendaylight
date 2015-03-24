@@ -113,7 +113,7 @@ class opendaylight::install {
           follow_redirects => true,
           # Should exist before we try to set its user/group/mode
           before           => File['/usr/lib/systemd/system/opendaylight.service'],
-        }  
+        }
 
         # Set the user:group owners and mode of ODL's systemd .service file
         file { '/usr/lib/systemd/system/opendaylight.service':
