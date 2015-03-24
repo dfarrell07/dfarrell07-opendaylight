@@ -9,27 +9,20 @@ require 'spec_helper_acceptance'
 
 describe 'opendaylight class' do
   describe 'testing install methods' do
-    context 'rpm install' do
-      # Call specialized helper fn to install OpenDaylight
-      install_odl
+    # Call specialized helper fn to install OpenDaylight
+    install_odl
 
-      # Use helper fn to run generic validations
-      generic_validations
-
+    # Run checks specific to install type, via env var passed from Rakefile
+    if ENV['INSTALL_METHOD'] == 'tarball'
+      # Call specialized helper fn for tarball-type install validations
+      tarball_validations
+    else
       # Call specialized helper fn for RPM-type install validations
       rpm_validations
     end
 
-    # TODO: This is under construction, see Issue #45
-    context 'tarball install' do
-      # Call specialized helper fn to install OpenDaylight
-      install_odl(install_method: 'tarball')
-
-      # Use helper fn to run generic validations
-      generic_validations
-
-      # TODO: Call specialized helper fn for tarball-type install validations
-    end
+    # Use helper fn to run generic validations
+    generic_validations
   end
 
   describe 'testing Karaf config file' do

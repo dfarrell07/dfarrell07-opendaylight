@@ -2,6 +2,10 @@
 #
 # Manages the installation of OpenDaylight.
 #
+# There are two install methods: RPM-based and tarball-based. The resulting
+# system state should be functionally equivalent, but we have to do more
+# work here for the tarball method (would normally be handled by the RPM).
+#
 class opendaylight::install {
   if $opendaylight::install_method == 'rpm' {
     # Choose Yum URL based on OS (CentOS vs Fedora)
@@ -41,57 +45,81 @@ class opendaylight::install {
       package => $package,
     }
 
-    # Create and configure the `odl` user
+    # Create and configure the odl user
     user { 'odl':
       ensure     => present,
       # Must be a valid dir for the auto-creation of some files
-      home       => "/opt/${opendaylight::odl_target_name}",
+      home       => '/opt/opendaylight/',
       # The odl user should, at the minimum, be a member of the odl group
       membership => 'minimum',
       groups     => 'odl',
-      # The odl user's home dir should exist before it's created
-      # The odl group, to which the odl user will below, should exist
-      require    => [Archive[$opendaylight::odl_target_name], Group['odl']],
-      before     => File["/opt/${opendaylight::odl_target_name}"],
+      # The odl user's home dir should exist before the user is created
+      # The odl group, to which the odl user will belong, should exist
+      require    => [Archive['opendaylight'], Group['odl']],
+      # The odl user will own this dir, user should exist before we set owner
+      before     => File['/opt/opendaylight/'],
     }
 
-    # Create and configure the `odl` group
+    # Create and configure the odl group
     group { 'odl':
       ensure => present,
-      # The `odl` user will be a member of this group, create it first
-      before => [File["/opt/${opendaylight::odl_target_name}"], User['odl']],
+      # The odl user will be a member of this group, create it first
+      # The odl user will own ODL's dir, so should exist before owner set 
+      before => [File['/opt/opendaylight/'], User['odl']],
     }
 
     # Download and extract the ODL tarball
-    archive { $opendaylight::odl_target_name:
+    archive { 'opendaylight':
       ensure           => present,
+      # URL from which ODL's tarball can be downloaded
       url              => $opendaylight::tarball_url,
-      # Will end up installing /opt/opendaylight-0.2.2
-      target           => "/opt/${opendaylight::odl_target_name}",
+      # Will end up installing /opt/opendaylight/
+      target           => '/opt/opendaylight/',
       # ODL doesn't provide a checksum in the expected path, would fail
       checksum         => false,
       # This discards top-level dir of extracted tarball
-      # Required to get proper /opt/opendaylight-<version> path
+      # Required to get proper /opt/opendaylight/ path
       strip_components => 1,
       # Default timeout is 120s, which may not be enough. See Issue #53:
       # https://github.com/dfarrell07/puppet-opendaylight/issues/53
       timeout          => 600,
-      # The odl user will set this to their home dir, should exist
-      before           => [File["/opt/${opendaylight::odl_target_name}"], User['odl']],
+      # ODL's archive should be dl'd/extracted before we config mode/user/group
+      # The odl user will set this to their home dir, should exist before user
+      before           => [File['/opt/opendaylight/'], User['odl']],
     }
-    
+
+    # Download ODL systemd .service file and put in right location
+    archive { 'opendaylight-systemd':
+      ensure           => present,
+      # URL from which ODL's systemd unitfile can be downloaded
+      url              => $opendaylight::unitfile_url,
+      # Will end up installing /usr/lib/systemd/system/opendaylight.service
+      target           => '/usr/lib/systemd/system/',
+      # Required by archive mod for correct exec `creates` param
+      root_dir         => 'opendaylight.service',
+      # ODL doesn't provide a checksum in the expected path, would fail
+      checksum         => false,
+      # This discards top-level dir of extracted tarball
+      # Required to avoid a subdir in system dir, generally get proper path
+      strip_components => 1,
+      # May end up with HTTP redirect output in a text file without this
+      # Note that the curl'd down file would still have a .tar.gz name
+      follow_redirects => true,
+      # The unitfile should exist before we try to set its user/group/mode
+      before           => File['/usr/lib/systemd/system/opendaylight.service'],
+    }
+
     # Set the user:group owners and mode of ODL dir
-    file { "/opt/${opendaylight::odl_target_name}":
+    file { '/opt/opendaylight/':
       # ensure=>dir and recurse=>true are required for managing recursively
       ensure  => 'directory',
       recurse => true,
       # Set user:group owners of ODL dir
       owner   => 'odl',
       group   => 'odl',
-      # Set mode of ODL dir
-      mode    => '0775',
-      # Should happen after archive extracted and user/group created
-      require => [Archive[$opendaylight::odl_target_name], Group['odl'], User['odl']],
+      # The ODL archive we're modifying should exist
+      # Since ODL's dir is owned by odl:odl, that user:group should exist
+      require => [Archive['opendaylight'], Group['odl'], User['odl']],
     }
     
     if ( $::osfamily == 'RedHat' ){

@@ -13,23 +13,25 @@
 
 ## Overview
 
-Puppet module for deploying the OpenDaylight Software Defined Networking (SDN) controller.
+Puppet module for deploying the [OpenDaylight Software Defined Networking (SDN) controller](http://www.opendaylight.org/).
 
 ## Module Description
 
-Stands up the OpenDaylight SDN controller from an RPM, including systemd configuration.
+Deploys and configrues the [OpenDaylight SDN controller](http://www.opendaylight.org/), including systemd configuration.
 
-The currently supported OpenDaylight version is Helium SR2 (0.2.2).
+Both supported install methods default to the lastest stable OpenDaylight release, which is currently Helium 0.2.2 SR2. 
 
 ## Setup
 
-### What opendaylight affects
+### What `opendaylight` affects
 
-* Installs OpenDaylight archive in /opt/ (may change as RPM matures).
-* Installs a [systemd unit file](https://github.com/dfarrell07/opendaylight-systemd/) for OpenDaylight.
+* Installs [OpenDaylight](http://www.opendaylight.org/).
+* Installs a [systemd unitfile](https://github.com/dfarrell07/opendaylight-systemd/) for OpenDaylight.
+* Starts the `opendaylight` systemd service.
 * Creates `odl:odl` user:group if they don't already exist.
+* Installs Java, which is required by ODL.
 
-### Beginning with opendaylight
+### Beginning with `opendaylight`
 
 To install and start OpenDaylight, include the `opendaylight` class: `include opendaylight`.
 
@@ -62,9 +64,7 @@ class { 'opendaylight':
 
 ### Install Method
 
-**Note: The tarball-based install method descrbed here is under active development. Currently, it's not stable and not recommended. See our GitHub Issues for the latest ([#45](https://github.com/dfarrell07/puppet-opendaylight/issues/45), possibly others). As far as we know, RPM-based installs are working fine.**
-
-The `install_method` param, and the associated `tarball_url` and `unitfile_url` params, are intended for use by developers who need to install a custom-built version of OpenDaylight.
+The `install_method` param, and the associated `tarball_url` and `unitfile_url` params, are intended for use by developers who need to install a custom-built version of OpenDaylight, or for automated build processes that need to consume a tarball build artifact.
 
 It's recommended that most people use the default RPM-based install.
 
@@ -95,20 +95,20 @@ class { 'opendaylight':
 
 #### Public classes
 
-* `opendaylight`: This is the modules main class. It installs and configures OpenDaylight.
+* `opendaylight`: Main entry point to the module. All ODL knobs should be managed through its params.
 
 #### Private classes
 
-* `opendaylight::params`: Manages default param values.
-* `opendaylight::config`: Manages the Karaf config file via a template.
-* `opendaylight::install`: Chooses the correct Yum repo URL based on OS, installs the OpenDaylight Yum repo, installs the OpenDaylight RPM.
-* `opendaylight::service`: Configures and starts the OpenDaylight service.
+* `opendaylight::params`: Contains default `opendaylight` class param values.
+* `opendaylight::config`: Manages ODL config, including Karaf features and REST port.
+* `opendaylight::install`: Installs ODL from an RPM or tarball.
+* `opendaylight::service`: Starts the OpenDaylight service.
 
 ## Limitations
 
 * The target OS must use systemd (Fedora 15+, CentOS 7+).
 * Only tested on Fedora 20, 21 and CentOS 7.
-* Currently only supports RPM-based installs.
+* CentOS 7 is currently the most stable OS option.
 
 ## Development
 
