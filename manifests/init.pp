@@ -29,6 +29,8 @@
 #   Array of IPs for each node in the HA cluster.
 # [*ha_node_index*]
 #   Index of ha_node_ips for this node.
+# [*enable_dhcp*]
+#   Enable or disable ODL Netvirt DHCP service. Valid: true, false.  Default: true
 #
 class opendaylight (
   $default_features = $::opendaylight::params::default_features,
@@ -44,6 +46,7 @@ class opendaylight (
   $enable_ha = $::opendaylight::params::enable_ha,
   $ha_node_ips = $::opendaylight::params::ha_node_ips,
   $ha_node_index = $::opendaylight::params::ha_node_index,
+  $enable_dhcp = $::opendaylight::params::enable_dhcp,
 ) inherits ::opendaylight::params {
 
   # Validate OS family

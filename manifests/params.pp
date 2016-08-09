@@ -21,4 +21,5 @@ class opendaylight::params {
   $enable_ha = false
   $ha_node_ips = []
   $ha_node_index = ''
+  $enable_dhcp = true
 }

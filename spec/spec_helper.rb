@@ -227,6 +227,38 @@ def enable_l3_tests(options = {})
   end
 end
 
+# Shared tests that specialize in testing enabling DHCP Service
+def enable_dhcp_tests(options = {})
+  # Extract params
+  # NB: This default value should be the same as one in opendaylight::params
+  # TODO: Remove this possible source of bugs^^
+  enable_dhcp = options.fetch(:enable_dhcp, true)
+
+  if [true].include? enable_dhcp
+    # Confirm ODL DHCP Service is enabled
+    it {
+      should contain_file('custom.properties').with(
+        'ensure'  => 'file',
+        'path'    => '/opt/opendaylight/etc/opendaylight/karaf/dhcpservice-impl-default-config.xml',
+        'owner'   => 'odl',
+        'group'   => 'odl',
+        'content' => /controller-dhcp-enabled>true/
+      )
+    }
+  elsif [false].include? enable_dhcp
+    # Confirm ODL DHCP Service is disabled
+    it {
+      should contain_file('custom.properties').with(
+        'ensure'  => 'file',
+        'path'    => '/opt/opendaylight/etc/opendaylight/karaf/dhcpservice-impl-default-config.xml',
+        'owner'   => 'odl',
+        'group'   => 'odl',
+        'content' => /controller-dhcp-enabled>false/
+      )
+    }
+  end
+end
+
 def tarball_install_tests(options = {})
   # Extract params
   # NB: These default values should be the same as ones in opendaylight::params

@@ -46,6 +46,11 @@ describe 'opendaylight' do
             # NB: Only testing defaults here, specialized enabling L3 tests elsewhere
             # Note that this function is defined in spec_helper
             enable_l3_tests
+
+            # Run tests that specialize in checking ODL DHCP Service config
+            # NB: Only testing defaults here, specialized enabling DHCP tests elsewhere
+            # Note that this function is defined in spec_helper
+            enable_dhcp_tests
           end
         end
 
@@ -105,6 +110,11 @@ describe 'opendaylight' do
             # NB: Only testing defaults here, specialized enabling L3 tests elsewhere
             # Note that this function is defined in spec_helper
             enable_l3_tests
+
+            # Run tests that specialize in checking ODL DHCP Service config
+            # NB: Only testing defaults here, specialized enabling DHCP tests elsewhere
+            # Note that this function is defined in spec_helper
+            enable_dhcp_tests
           end
         end
 
@@ -180,6 +190,11 @@ describe 'opendaylight' do
             # NB: Only testing defaults here, specialized enabling L3 tests elsewhere
             # Note that this function is defined in spec_helper
             enable_l3_tests
+
+            # Run tests that specialize in checking ODL DHCP Service config
+            # NB: Only testing defaults here, specialized enabling DHCP tests elsewhere
+            # Note that this function is defined in spec_helper
+            enable_dhcp_tests
           end
         end
 
@@ -535,6 +550,73 @@ describe 'opendaylight' do
       # Run test that specialize in checking ODL OVSDB L3 config
       # Note that this function is defined in spec_helper
       enable_l3_tests(enable_l3: true)
+    end
+  end
+
+  # All DHCP Service enable/disable tests
+  describe 'DHCP Service enable/disable tests' do
+    # Non-OS-type tests assume CentOS 7
+    #   See issue #43 for reasoning:
+    #   https://github.com/dfarrell07/puppet-opendaylight/issues/43#issue-57343159
+    osfamily = 'RedHat'
+    operatingsystem = 'CentOS'
+    operatingsystemmajrelease = '7'
+    context 'using enable_dhcp default' do
+      let(:facts) {{
+        :osfamily => osfamily,
+        :operatingsystem => operatingsystem,
+        :operatingsystemmajrelease => operatingsystemmajrelease,
+      }}
+
+      let(:params) {{ }}
+
+      # Run shared tests applicable to all supported OSs
+      # Note that this function is defined in spec_helper
+      generic_tests
+
+      # Run test that specialize in checking ODL DHCP Service config
+      # Note that this function is defined in spec_helper
+      enable_dhcp_tests
+    end
+
+    context 'using false for enable_dhcp' do
+      let(:facts) {{
+        :osfamily => osfamily,
+        :operatingsystem => operatingsystem,
+        :operatingsystemmajrelease => operatingsystemmajrelease,
+      }}
+
+      let(:params) {{
+        :enable_dhcp => false ,
+      }}
+
+      # Run shared tests applicable to all supported OSs
+      # Note that this function is defined in spec_helper
+      generic_tests
+
+      # Run test that specialize in checking ODL DHCP Service config
+      # Note that this function is defined in spec_helper
+      enable_dhcp_tests(enable_dhcp: false)
+    end
+
+    context 'using true for enable_dhcp' do
+      let(:facts) {{
+        :osfamily => osfamily,
+        :operatingsystem => operatingsystem,
+        :operatingsystemmajrelease => operatingsystemmajrelease,
+      }}
+
+      let(:params) {{
+        :enable_dhcp => true,
+      }}
+
+      # Run shared tests applicable to all supported OSs
+      # Note that this function is defined in spec_helper
+      generic_tests
+
+      # Run test that specialize in checking ODL DHCP Service config
+      # Note that this function is defined in spec_helper
+      enable_dhcp_tests(enable_dhcp: true)
     end
   end
 

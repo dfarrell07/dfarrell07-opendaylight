@@ -77,4 +77,15 @@ class opendaylight::config {
       fail("Number of HA nodes less than 2: ${ha_node_count} and HA Enabled")
     }
   }
+
+  # Configure DHCP service
+  file { 'dhcpservice-impl-default-config.xml':
+    ensure  => file,
+    path    => '/opt/opendaylight/etc/opendaylight/karaf/dhcpservice-impl-default-config.xml',
+    # Set user:group owners
+    owner   => 'odl',
+    group   => 'odl',
+    # Use a template to populate the content
+    content => template('opendaylight/dhcpservice-impl-default-config.xml.erb'),
+  }
 }

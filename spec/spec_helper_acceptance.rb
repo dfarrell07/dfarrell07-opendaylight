@@ -63,6 +63,7 @@ def install_odl(options = {})
   odl_rest_port = options.fetch(:odl_rest_port, 8080)
   log_levels = options.fetch(:log_levels, {})
   enable_l3 = options.fetch(:enable_l3, 'no')
+  enable_dhcp = options.fetch(:enable_dhcp, true)
 
   # Build script for consumption by Puppet apply
   it 'should work idempotently with no errors' do
@@ -75,6 +76,7 @@ def install_odl(options = {})
       odl_rest_port=> #{odl_rest_port},
       enable_l3=> #{enable_l3},
       log_levels=> #{log_levels},
+      enable_dhcp=> #{enable_dhcp},
     }
     EOS
 
@@ -303,6 +305,21 @@ def enable_l3_validations(options = {})
       it { should be_grouped_into 'odl' }
       its(:content) { should match /^ovsdb.l3.fwd.enabled=no/ }
     end
+  end
+end
+
+# Shared function for validations related to ODL OVSDB L3 config
+def enable_dhcp_validations(options = {})
+  # NB: This param default should match the one used by the opendaylight
+  #   class, which is defined in opendaylight::params
+  # TODO: Remove this possible source of bugs^^
+  enable_dhcp = options.fetch(:enable_dhcp, true)
+
+  describe file('/opt/opendaylight/etc/opendaylight/karaf/dhcpservice-impl-default-config.xml') do
+    it { should be_file }
+    it { should be_owned_by 'odl' }
+    it { should be_grouped_into 'odl' }
+    its(:content) { should match /controller-dhcp-enabled>#{enable_dhcp}/ }
   end
 end
 

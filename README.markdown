@@ -232,6 +232,17 @@ class { 'opendaylight':
 }
 ```
 
+### Disabling ODL DHCP Service
+
+To disable ODL DHCP Service, use the `enable_dhcp` flag. It's enabled by
+default.
+
+```puppet
+class { 'opendaylight':
+  enable_dhcp => false,
+}
+```
+
 ## Reference
 
 ### Classes
@@ -409,6 +420,31 @@ Default: `'https://github.com/dfarrell07/opendaylight-systemd/archive/master/ope
 
 Valid options: A valid URL to an ODL systemd .service file (archived in a
 tarball) as a string.
+
+##### `enable_dhcp`
+
+Enable or disable ODL DHCP Service.
+
+Default: `true`
+
+Valid options: Boolean values `true` and `false`.
+
+The ODL DHCP Service config in `/opt/opendaylight/etc/opendaylight/karaf/dhcpservice-impl-default-config.xml` is set to
+the value of the `enable_dhcp` param.
+
+A manifest like
+
+```puppet
+class { 'opendaylight':
+  enable_dhcp => false,
+}
+```
+
+Would would result in
+
+```
+<controller-dhcp-enabled>false</controller-dhcp-enabled>
+```
 
 ## Limitations
 

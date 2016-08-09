@@ -164,4 +164,30 @@ describe 'opendaylight class' do
       enable_l3_validations(enable_l3: true)
     end
   end
+
+  describe 'testing ODL DHCP Service config' do
+    context 'using enable_dhcp default' do
+      # Call specialized helper fn to install OpenDaylight
+      install_odl
+
+      # Call specialized helper fn for ODL DHCP Service config validations
+      enable_dhcp_validations
+    end
+
+    context 'using false for enable_dhcp' do
+      # Call specialized helper fn to install OpenDaylight
+      install_odl(enable_dhcp: false)
+
+      # Call specialized helper fn for ODL DHCP Service config validations
+      enable_dhcp_validations(enable_dhcp: false)
+    end
+
+    context 'using true for enable_dhcp' do
+      # Call specialized helper fn to install OpenDaylight
+      install_odl(enable_dhcp: true)
+
+      # Call specialized helper fn for ODL DHCP Service config validations
+      enable_dhcp_validations(enable_dhcp: true)
+    end
+  end
 end
