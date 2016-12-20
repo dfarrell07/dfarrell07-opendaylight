@@ -66,7 +66,7 @@ class opendaylight (
       if $::operatingsystemmajrelease != '7' {
         # RHEL/CentOS versions < 7 not supported as they lack systemd
         fail("Unsupported OS: ${::operatingsystem} ${::operatingsystemmajrelease}")
-      } elsif defined('::operatingsystemrelease') {
+      } elsif defined('$::operatingsystemrelease') {
           if (versioncmp($::operatingsystemrelease, '7.3') < 0) {
             # Versions < 7.3 do not support stateful security groups
             $stateful_unsupported = true

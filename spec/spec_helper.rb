@@ -411,15 +411,13 @@ def unsupported_os_tests(options = {})
   it { expect { should contain_file('org.apache.karaf.features.cfg') }.to raise_error(Puppet::Error, /#{expected_msg}/) }
 end
 
-# Shared tests that specialize in testing enabling L3 via ODL OVSDB
-def enable_sg_tests(options = {})
+# Shared tests that specialize in testing security group mode
+def enable_sg_tests(sg_mode='stateful', os_release)
   # Extract params
   # NB: This default value should be the same as one in opendaylight::params
   # TODO: Remove this possible source of bugs^^
-  sg_mode = options.fetch(:security_group_mode, 'stateful')
-  os_release = options.fetch(:osrelease)
 
-  if !os_release.include? '7.3' and ['stateful'].include? sg_mode
+  if os_release != '7.3' and sg_mode == 'stateful'
     # Confirm sg_mode becomes learn
     it {
       should contain_file('netvirt-aclservice-config.xml').with(

@@ -730,7 +730,7 @@ describe 'opendaylight' do
 
       # Run test that specialize in checking security groups
       # Note that this function is defined in spec_helper
-      enable_sg_tests(security_group_mode: 'stateful', osrelease: '7.3')
+      enable_sg_tests('stateful', '7.3')
     end
 
     context 'using unsupported stateful' do
@@ -752,7 +752,7 @@ describe 'opendaylight' do
 
       # Run test that specialize in checking security groups
       # Note that this function is defined in spec_helper
-      enable_sg_tests(security_group_mode: 'stateful', osrelease: '7.3')
+      enable_sg_tests('stateful', '7.2.1511')
     end
 
     context 'using transparent with unsupported stateful' do
@@ -774,7 +774,7 @@ describe 'opendaylight' do
 
       # Run test that specialize in checking security groups
       # Note that this function is defined in spec_helper
-      enable_sg_tests(security_group_mode: 'transparent', osrelease: '7.2.1511')
+      enable_sg_tests('transparent', '7.2.1511')
     end
   end
 end

@@ -82,13 +82,9 @@ class opendaylight::config {
   # Requires at least CentOS 7.3 for RHEL/CentOS systems
   if ('odl-netvirt-openstack' in $opendaylight::features) {
     if $opendaylight::security_group_mode == 'stateful' {
-      if defined('$opendaylight::stateful_unsupported') {
-        if $opendaylight::stateful_unsupported {
+      if defined('$opendaylight::stateful_unsupported') and $opendaylight::stateful_unsupported {
           warning("Stateful is unsupported in ${::operatingsystemrelease} setting to 'learn'")
           $sg_mode = 'learn'
-        } else {
-            $sg_mode = 'learn'
-        }
       } else {
         $sg_mode = 'stateful'
       }
