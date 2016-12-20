@@ -4,17 +4,18 @@ We work to make contributing easy. Please let us know if you spot something
 we can do better.
 
 #### Table of Contents
+
 1. [Overview](#overview)
-1. [Communication](#communication)
-    * [Issues](#issues)
-    * [IRC channel](#irc-channel)
-1. [Patches](#patches)
-1. [Testing](#testing)
-    * [Test Dependencies](#test-dependencies)
-    * [Syntax and Style Tests](#syntax-and-style-tests)
-    * [Unit Tests](#unit-tests)
-    * [System Tests](#system-tests)
-    * [Tests in Continuous Integration](#tests-in-continuous-integration)
+2. [Communication](#communication)
+   - [Issues](#issues)
+   - [IRC channel](#irc-channel)
+3. [Patches](#patches)
+4. [Testing](#testing)
+   - [Test Dependencies](#test-dependencies)
+   - [Syntax and Style Tests](#syntax-and-style-tests)
+   - [Unit Tests](#unit-tests)
+   - [System Tests](#system-tests)
+   - [Tests in Continuous Integration](#tests-in-continuous-integration)
 
 ## Overview
 
@@ -71,24 +72,26 @@ Feel free to join us at **#opendaylight-integration** on `chat.freenode.net`. Yo
 Please use [Pull Requests][2] to submit patches.
 
 Basics of a pull request:
-* Use the GitHub web UI to fork our repo.
-* Clone your fork to your local system.
-* Make your changes.
-* Commit your changes, using a [good commit message][7] and referencing any
-applicable issues.
-* Push your commit.
-* Submit a pull request against the project, again using GitHub's web UI.
-* We'll give feedback and get your changed merged ASAP.
-* You contributed! [Thank you][8]!
+
+- Use the GitHub web UI to fork our repo.
+- Clone your fork to your local system.
+- Make your changes.
+- Commit your changes, using a [good commit message][7] and referencing any
+  applicable issues.
+- Push your commit.
+- Submit a pull request against the project, again using GitHub's web UI.
+- We'll give feedback and get your changed merged ASAP.
+- You contributed! [Thank you][8]!
 
 Other tips for submitting excellent pull requests:
-* If you'd like to make more than one logically distinct change, please submit
-them as different pull requests (if they don't depend on each other) or
-different commits in the same PR (if they do).
-* If your PR contains a number of commits that provide one logical change,
-please squash them using `git rebase`.
-* Please provide test coverage for your changes.
-* If applicable, please provide documentation updates to reflect your changes.
+
+- If you'd like to make more than one logically distinct change, please submit
+  them as different pull requests (if they don't depend on each other) or
+  different commits in the same PR (if they do).
+- If your PR contains a number of commits that provide one logical change,
+  please squash them using `git rebase`.
+- Please provide test coverage for your changes.
+- If applicable, please provide documentation updates to reflect your changes.
 
 ## Testing
 
@@ -212,23 +215,40 @@ We use [Travis CI][16] to run our unit, syntax and style tests against a
 matrix of supported Ruby and Puppet versions at every commit. This currently
 results in >8500 automated tests per commit.
 
-
 [1]: https://github.com/dfarrell07/puppet-opendaylight/issues
+
 [2]: https://github.com/dfarrell07/puppet-opendaylight/pulls
+
 [3]: https://github.com/dfarrell07/puppet-opendaylight/labels/good-for-beginners
+
 [4]: https://github.com/dfarrell07/puppet-opendaylight/labels/prio%3Ahigh
+
 [5]: https://github.com/dfarrell07/puppet-opendaylight/labels/prio%3Anormal
+
 [6]: https://help.github.com/articles/closing-issues-via-commit-messages/
+
 [7]: http://chris.beams.io/posts/git-commit/
+
 [8]: http://cdn3.volusion.com/74gtv.tjme9/v/vspfiles/photos/Delicious%20Dozen-1.jpg
+
 [9]: http://bundler.io/
+
 [10]: http://puppet-lint.com/
+
 [11]: https://github.com/gds-operations/puppet-syntax
+
 [12]: https://github.com/puppet-community/metadata-json-lint
+
 [13]: https://github.com/puppetlabs/beaker
+
 [14]: http://serverspec.org/resource_types.html
+
 [15]: https://github.com/puppetlabs/beaker/wiki/How-to-Write-a-Beaker-Test-for-a-Module#typical-workflow
+
 [16]: https://travis-ci.org/dfarrell07/puppet-opendaylight
+
 [17]: https://www.vagrantup.com/downloads.html
+
 [18]: www.virtualbox.org/wiki/Linux_Downloads
+
 [19]: http://webchat.freenode.net/?channels=opendaylight-integration

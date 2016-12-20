@@ -18,17 +18,17 @@ env:
   - PUPPET_VERSION="~> 4.3.0"
 matrix:
   exclude:
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.4.0"
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.5.0"
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.6.0"
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.7.0"
+    - rvm: 2.2.3
+      env: PUPPET_VERSION="~> 3.4.0"
+    - rvm: 2.2.3
+      env: PUPPET_VERSION="~> 3.5.0"
+    - rvm: 2.2.3
+      env: PUPPET_VERSION="~> 3.6.0"
+    - rvm: 2.2.3
+      env: PUPPET_VERSION="~> 3.7.0"
 notifications:
-    email:
-        recipients:
-            - dfarrell@redhat.com
-    on_success: change
-    on_failure: change
+  email:
+    recipients:
+      - dfarrell@redhat.com
+  on_success: change
+  on_failure: change

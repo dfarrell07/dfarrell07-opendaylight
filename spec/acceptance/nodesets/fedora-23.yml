@@ -1,3 +1,4 @@
+---
 HOSTS:
   fedora-23:
     roles:
