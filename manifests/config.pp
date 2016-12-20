@@ -93,7 +93,8 @@ class opendaylight::config {
     }
 
     $odl_datastore = [
-      '/opt/opendaylight/etc/opendaylight', '/opt/opendaylight/etc/opendaylight/datastore',
+      '/opt/opendaylight/etc/opendaylight',
+      '/opt/opendaylight/etc/opendaylight/datastore',
       '/opt/opendaylight/etc/opendaylight/datastore/initial',
       '/opt/opendaylight/etc/opendaylight/datastore/initial/config',
     ]
