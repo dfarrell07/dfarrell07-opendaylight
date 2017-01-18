@@ -4,17 +4,18 @@ We work to make contributing easy. Please let us know if you spot something
 we can do better.
 
 #### Table of Contents
+
 1. [Overview](#overview)
-1. [Communication](#communication)
-    * [Issues](#issues)
-    * [Gitter](#gitter)
-1. [Patches](#patches)
-1. [Testing](#testing)
-    * [Test Dependencies](#test-dependencies)
-    * [Syntax and Style Tests](#syntax-and-style-tests)
-    * [Unit Tests](#unit-tests)
-    * [System Tests](#system-tests)
-    * [Tests in Continuous Integration](#tests-in-continuous-integration)
+2. [Communication](#communication)
+   - [Issues](#issues)
+   - [IRC channel](#irc-channel)
+3. [Patches](#patches)
+4. [Testing](#testing)
+   - [Test Dependencies](#test-dependencies)
+   - [Syntax and Style Tests](#syntax-and-style-tests)
+   - [Unit Tests](#unit-tests)
+   - [System Tests](#system-tests)
+   - [Tests in Continuous Integration](#tests-in-continuous-integration)
 
 ## Overview
 
@@ -62,42 +63,41 @@ referencing the issue's number (`#42`) will link the commit and issue. Issues
 can also be closed from commit messages with `closes #42` (and [a variety
 of other key words][6]).
 
-### Gitter
+### IRC channel
 
-We're experimenting with Gitter, a GitHub-driven chat service that works on a
-per-repo basis.
-
-Feel free to hop in [our room][7] and test it out with us.
+Feel free to join us at **#opendaylight-integration** on `chat.freenode.net`. You can also use web client for Freenode to join us at [webchat][19].
 
 ## Patches
 
 Please use [Pull Requests][2] to submit patches.
 
 Basics of a pull request:
-* Use the GitHub web UI to fork our repo.
-* Clone your fork to your local system.
-* Make your changes.
-* Commit your changes, using a [good commit message][8] and referencing any
-applicable issues.
-* Push your commit.
-* Submit a pull request against the project, again using GitHub's web UI.
-* We'll give feedback and get your changed merged ASAP.
-* You contributed! [Thank you][9]!
+
+- Use the GitHub web UI to fork our repo.
+- Clone your fork to your local system.
+- Make your changes.
+- Commit your changes, using a [good commit message][7] and referencing any
+  applicable issues.
+- Push your commit.
+- Submit a pull request against the project, again using GitHub's web UI.
+- We'll give feedback and get your changed merged ASAP.
+- You contributed! [Thank you][8]!
 
 Other tips for submitting excellent pull requests:
-* If you'd like to make more than one logically distinct change, please submit
-them as different pull requests (if they don't depend on each other) or
-different commits in the same PR (if they do).
-* If your PR contains a number of commits that provide one logical change,
-please squash them using `git rebase`.
-* Please provide test coverage for your changes.
-* If applicable, please provide documentation updates to reflect your changes.
+
+- If you'd like to make more than one logically distinct change, please submit
+  them as different pull requests (if they don't depend on each other) or
+  different commits in the same PR (if they do).
+- If your PR contains a number of commits that provide one logical change,
+  please squash them using `git rebase`.
+- Please provide test coverage for your changes.
+- If applicable, please provide documentation updates to reflect your changes.
 
 ## Testing
 
 ### Test Dependencies
 
-The testing tools have a number of dependencies. We use [Bundler][10] to make
+The testing tools have a number of dependencies. We use [Bundler][9] to make
 installing them easy.
 
 ```
@@ -110,7 +110,7 @@ installing them easy.
 
 ### Syntax and Style Tests
 
-We use [Puppet Lint][11], [Puppet Syntax][12] and [metadata-json-lint][13] to
+We use [Puppet Lint][10], [Puppet Syntax][11] and [metadata-json-lint][12] to
 validate the module's syntax and style.
 
 ```
@@ -150,14 +150,14 @@ To run the syntax, style and unit tests in one rake task (recommended), use:
 While the [unit tests](#unit-tests) are able to quickly find many errors,
 they don't do much more than checking that the code compiles to a given state.
 To verify that the Puppet module behaves as desired once applied to a real,
-running system, we use [Beaker][14].
+running system, we use [Beaker][13].
 
 Beaker stands up virtual machines using Vagrant, applies the OpenDaylight
-Puppet module with various combinations of params and uses [Serverspec][15]
+Puppet module with various combinations of params and uses [Serverspec][14]
 to validate the resulting system state.
 
-Beaker depends on Vagrant ([Vagrant downloads page][18]) for managing VMs,
-which in turn depends on VirtualBox ([VirtualBox downloads page][19]) and
+Beaker depends on Vagrant ([Vagrant downloads page][17]) for managing VMs,
+which in turn depends on VirtualBox ([VirtualBox downloads page][18]) and
 the `kmod-VirtualBox` package.
 
 To run our Beaker tests against the primary target OS (CentOS 7) using the
@@ -207,31 +207,48 @@ opendaylight.service - OpenDaylight SDN Controller
 [~/puppet-opendaylight/.vagrant/beaker_vagrant_files/centos-7.yml]$ vagrant destroy -f
 ```
 
-For more information about using Beaker, see [these docs][16].
+For more information about using Beaker, see [these docs][15].
 
 ### Tests in Continuous Integration
 
-We use [Travis CI][17] to run our unit, syntax and style tests against a
+We use [Travis CI][16] to run our unit, syntax and style tests against a
 matrix of supported Ruby and Puppet versions at every commit. This currently
 results in >8500 automated tests per commit.
 
-
 [1]: https://github.com/dfarrell07/puppet-opendaylight/issues
+
 [2]: https://github.com/dfarrell07/puppet-opendaylight/pulls
+
 [3]: https://github.com/dfarrell07/puppet-opendaylight/labels/good-for-beginners
+
 [4]: https://github.com/dfarrell07/puppet-opendaylight/labels/prio%3Ahigh
+
 [5]: https://github.com/dfarrell07/puppet-opendaylight/labels/prio%3Anormal
+
 [6]: https://help.github.com/articles/closing-issues-via-commit-messages/
-[7]: https://gitter.im/dfarrell07/puppet-opendaylight
-[8]: http://chris.beams.io/posts/git-commit/
-[9]: http://cdn3.volusion.com/74gtv.tjme9/v/vspfiles/photos/Delicious%20Dozen-1.jpg
-[10]: http://bundler.io/
-[11]: http://puppet-lint.com/
-[12]: https://github.com/gds-operations/puppet-syntax
-[13]: https://github.com/puppet-community/metadata-json-lint
-[14]: https://github.com/puppetlabs/beaker
-[15]: http://serverspec.org/resource_types.html
-[16]: https://github.com/puppetlabs/beaker/wiki/How-to-Write-a-Beaker-Test-for-a-Module#typical-workflow
-[17]: https://travis-ci.org/dfarrell07/puppet-opendaylight
-[18]: https://www.vagrantup.com/downloads.html
-[19]: www.virtualbox.org/wiki/Linux_Downloads
+
+[7]: http://chris.beams.io/posts/git-commit/
+
+[8]: http://cdn3.volusion.com/74gtv.tjme9/v/vspfiles/photos/Delicious%20Dozen-1.jpg
+
+[9]: http://bundler.io/
+
+[10]: http://puppet-lint.com/
+
+[11]: https://github.com/gds-operations/puppet-syntax
+
+[12]: https://github.com/puppet-community/metadata-json-lint
+
+[13]: https://github.com/puppetlabs/beaker
+
+[14]: http://serverspec.org/resource_types.html
+
+[15]: https://github.com/puppetlabs/beaker/wiki/How-to-Write-a-Beaker-Test-for-a-Module#typical-workflow
+
+[16]: https://travis-ci.org/dfarrell07/puppet-opendaylight
+
+[17]: https://www.vagrantup.com/downloads.html
+
+[18]: www.virtualbox.org/wiki/Linux_Downloads
+
+[19]: http://webchat.freenode.net/?channels=opendaylight-integration

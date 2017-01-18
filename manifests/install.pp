@@ -8,21 +8,14 @@
 #
 class opendaylight::install {
   if $opendaylight::install_method == 'rpm' {
-    # Choose Yum URL based on OS (CentOS vs Fedora)
-    # NB: Currently using the CentOS CBS for both Fedora and CentOS
-    $base_url = $::operatingsystem ? {
-      'CentOS' => 'http://cbs.centos.org/repos/nfv7-opendaylight-41-release/$basearch/os/',
-      'Fedora' => 'http://cbs.centos.org/repos/nfv7-opendaylight-41-release/$basearch/os/',
-    }
-
     # Add OpenDaylight's Yum repository
-    yumrepo { 'opendaylight-41-release':
+    yumrepo { $opendaylight::rpm_repo:
       # 'ensure' isn't supported with Puppet <3.5
       # Seems to default to present, but docs don't say
       # https://docs.puppetlabs.com/references/3.4.0/type.html#yumrepo
       # https://docs.puppetlabs.com/references/3.5.0/type.html#yumrepo
-      baseurl  => $base_url,
-      descr    => 'CentOS CBS OpenDaylight Berillium testing repository',
+      baseurl  => "http://cbs.centos.org/repos/nfv7-${opendaylight::rpm_repo}/\$basearch/os/",
+      descr    => 'OpenDaylight SDN Controller',
       enabled  => 1,
       # NB: RPM signing is an active TODO, but is not done. We will enable
       #     this gpgcheck once the RPM supports it.
@@ -33,11 +26,11 @@ class opendaylight::install {
     # Install the OpenDaylight RPM
     package { 'opendaylight':
       ensure  => present,
-      require => Yumrepo['opendaylight-41-release'],
+      require => Yumrepo[$opendaylight::rpm_repo],
     }
     ->
     # Configure the systemd file to force ipv4 binds (instead of ipv6)
-    file_line { 'odl_start_ipv4 ':
+    file_line { 'odl_start_ipv4':
       ensure => present,
       path   => '/usr/lib/systemd/system/opendaylight.service',
       line   => 'Environment=_JAVA_OPTIONS=\'-Djava.net.preferIPv4Stack=true\'',
@@ -95,6 +88,7 @@ class opendaylight::install {
       # This discards top-level dir of extracted tarball
       # Required to get proper /opt/opendaylight/ path
       strip_components => 1,
+      root_dir         => '.',
       # Default timeout is 120s, which may not be enough. See Issue #53:
       # https://github.com/dfarrell07/puppet-opendaylight/issues/53
       timeout          => 600,

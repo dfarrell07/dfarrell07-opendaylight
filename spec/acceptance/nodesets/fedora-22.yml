@@ -1,10 +1,11 @@
+---
 HOSTS:
   fedora-22:
     roles:
       - master
     platform: fedora-22-x86_64
-    box: boxcutter/fedora22
-    box_url: https://atlas.hashicorp.com/boxcutter/boxes/fedora22
+    box: fedora/22-cloud-base
+    box_url: https://dl.fedoraproject.org/pub/fedora/linux/releases/22/Cloud/x86_64/Images/Fedora-Cloud-Base-Vagrant-22-20150521.x86_64.vagrant-virtualbox.box
     hypervisor: vagrant
 
 CONFIG:

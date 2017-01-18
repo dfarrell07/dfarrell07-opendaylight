@@ -28,3 +28,13 @@
 - Add param to config ODL's bind IP addr
 2016-03-23 Release 3.5.0
 - Update ODL to Beryllium SR1
+2016-06-01 Release 3.6.0
+- Update ODL to Beryllium SR2
+2016-06-01 Release 3.6.1
+- Minor bump due to Puppetforge issue
+2016-06-02 Release 3.7.0
+- Add param to configure ODL RPM repo
+2016-08-08 Release 3.7.1
+- Install ODL RPM from latest Beryllium SR repo
+2016-08-08 Release 3.7.2
+- Install ODL RPM from Boron testing repo

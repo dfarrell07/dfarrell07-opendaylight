@@ -71,9 +71,47 @@ class opendaylight::config {
       exec { 'Configure ODL OVSDB Clustering':
         command => "configure_cluster.sh ${::opendaylight::ha_node_index} ${ha_node_ip_str}",
         path    => '/opt/opendaylight/bin/:/usr/sbin:/usr/bin:/sbin:/bin',
+        creates => '/opt/opendaylight/configuration/initial/akka.conf'
       }
     } else {
       fail("Number of HA nodes less than 2: ${ha_node_count} and HA Enabled")
+    }
+  }
+
+  # Configure ACL security group
+  # Requires at least CentOS 7.3 for RHEL/CentOS systems
+  if ('odl-netvirt-openstack' in $opendaylight::features) {
+    if $opendaylight::security_group_mode == 'stateful' {
+      if defined('$opendaylight::stateful_unsupported') and $opendaylight::stateful_unsupported {
+          warning("Stateful is unsupported in ${::operatingsystemrelease} setting to 'learn'")
+          $sg_mode = 'learn'
+      } else {
+        $sg_mode = 'stateful'
+      }
+    } else {
+      $sg_mode = $opendaylight::security_group_mode
+    }
+
+    $odl_datastore = [
+      '/opt/opendaylight/etc/opendaylight',
+      '/opt/opendaylight/etc/opendaylight/datastore',
+      '/opt/opendaylight/etc/opendaylight/datastore/initial',
+      '/opt/opendaylight/etc/opendaylight/datastore/initial/config',
+    ]
+
+    file { $odl_datastore:
+      ensure => directory,
+      mode   => '0755',
+      owner  => 'odl',
+      group  => 'odl',
+    }
+    ->
+    file { 'netvirt-aclservice-config.xml':
+      ensure  => file,
+      path    => '/opt/opendaylight/etc/opendaylight/datastore/initial/config/netvirt-aclservice-config.xml',
+      owner   => 'odl',
+      group   => 'odl',
+      content => template('opendaylight/netvirt-aclservice-config.xml.erb'),
     }
   }
 }

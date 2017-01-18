@@ -2,7 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-
   # Re-map sync'd dir so it has the same name as the module
   # Not doing this causes `puppet apply` to fail at catalog compile
   config.vm.synced_folder ".", "/home/vagrant/puppet-opendaylight", type: "rsync"

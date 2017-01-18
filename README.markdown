@@ -1,26 +1,27 @@
 [![CI Status][4]][1]
 [![Dependency Status][5]][2]
-[![Project Chatroom][6]][3]
 
 # OpenDaylight
 
-#### Table of Contents 
+#### Table of Contents
+
 1. [Overview](#overview)
-1. [Module Description](#module-description)
-1. [Setup](#setup)
-  * [What `opendaylight` affects](#what-opendaylight-affects)
-  * [Beginning with `opendaylight`](#beginning-with-opendaylight)
-1. [Usage](#usage)
-  * [Karaf Features](#karaf-features)
-  * [Install Method](#install-method)
-  * [Ports](#ports)
-  * [Log Verbosity](#log-verbosity)
-  * [Enabling ODL OVSDB L3](#enabling-odl-ovsdb-l3)
-  * [Enabling ODL OVSDB HA](#enabling-odl-ovsdb-ha)
-1. [Reference ](#reference)
-1. [Limitations](#limitations)
-1. [Development](#development)
-1. [Release Notes/Contributors](#release-notescontributors)
+2. [Module Description](#module-description)
+3. [Setup](#setup)
+  - [What `opendaylight` affects](#what-opendaylight-affects)
+  - [Beginning with `opendaylight`](#beginning-with-opendaylight)
+4. [Usage](#usage)
+  - [Karaf Features](#karaf-features)
+  - [Install Method](#install-method)
+  - [RPM Repo](#rpm-repo)
+  - [Ports](#ports)
+  - [Log Verbosity](#log-verbosity)
+  - [Enabling ODL OVSDB L3](#enabling-odl-ovsdb-l3)
+  - [Enabling ODL OVSDB HA](#enabling-odl-ovsdb-ha)
+5. [Reference ](#reference)
+6. [Limitations](#limitations)
+7. [Development](#development)
+8. [Release Notes/Contributors](#release-notescontributors)
 
 ## Overview
 
@@ -36,21 +37,22 @@ All OpenDaylight configuration should be handled through the ODL Puppet
 module's [params](#parameters). If you need a new knob, [please raise an
 Issue][8].
 
-Both supported [install methods](#install-method) default to the latest
-OpenDaylight release, which is currently [Beryllium][18].
+The master branch installs OpenDaylight from the latest testing RPM repository
+by default. There are stable/<release> branches that install OpenDaylight
+releases and service releases, like Beryllium or Beryllium SR3.
 
 ## Setup
 
 ### What `opendaylight` affects
 
-* Installs Java, which is required by ODL.
-* Creates `odl:odl` user:group if they don't already exist.
-* Installs [OpenDaylight][7].
-* Installs a [systemd unitfile][9] or [Upstart config file][10] for
-OpenDaylight.
-* Manipulates OpenDaylight's configuration files according to the params
-passed to the `::opendaylight` class.
-* Starts the `opendaylight` systemd or Upstart service.
+- Installs Java, which is required by ODL.
+- Creates `odl:odl` user:group if they don't already exist.
+- Installs [OpenDaylight][7].
+- Installs a [systemd unitfile][9] or [Upstart config file][10] for
+  OpenDaylight.
+- Manipulates OpenDaylight's configuration files according to the params
+  passed to the `::opendaylight` class.
+- Starts the `opendaylight` systemd or Upstart service.
 
 ### Beginning with `opendaylight`
 
@@ -151,11 +153,38 @@ class { 'opendaylight':
 }
 ```
 
+### RPM Repo
+
+The `rpm_repo` param can be used to configure which RPM repository
+OpenDaylight is installed from.
+
+```puppet
+class { 'opendaylight':
+  rpm_repo => 'opendaylight-40-release',
+}
+```
+
+The naming convention follows the naming convention of the CentOS Community
+Build System, which is where upstream ODL hosts its RPMs. The
+`opendaylight-40-release` example above would install OpenDaylight Beryllium
+4.0.0 from the [nfv7-opendaylight-40-release][18] repo. Repo names ending in
+`-release` will always contain well-tested, officially released versions of
+OpenDaylight. Repos ending in `-testing` contain frequent, but unstable and
+unofficial, releases. The ODL version given in repo names shows which major
+and minor version it is pinned to. The `opendaylight-40-release` repo will
+always provide OpenDaylight Beryllium 4.0, whereas `opendaylight-4-release`
+will provide the latest release with major version 4 (which could include
+Service Releases, like SR2 4.2).
+
+For a full list of OpenDaylight releases and their CBS repos, see the
+[OpenDaylight Deployment wiki][19].
+
+This is only read when `install_method` is `rpm`.
+
 ### Ports
 
 To change the port on which OpenDaylight's northbound listens for REST API
 calls, use the `odl_rest_port` param.
-
 
 ```puppet
 class { 'opendaylight':
@@ -184,7 +213,7 @@ class { 'opendaylight':
 }
 ```
 
-### Enable ODL OVSDB HA
+### Enabling ODL OVSDB HA
 
 To enable ODL OVSDB HA, use the `enable_ha` flag. It's disabled by default.
 
@@ -208,16 +237,16 @@ class { 'opendaylight':
 
 #### Public classes
 
-* `::opendaylight`: Main entry point to the module. All ODL knobs should be
-managed through its params.
+- `::opendaylight`: Main entry point to the module. All ODL knobs should be
+  managed through its params.
 
 #### Private classes
 
-* `::opendaylight::params`: Contains default `opendaylight` class param values.
-* `::opendaylight::install`: Installs ODL from an RPM or tarball.
-* `::opendaylight::config`: Manages ODL config, including Karaf features and
-REST port.
-* `::opendaylight::service`: Starts the OpenDaylight service.
+- `::opendaylight::params`: Contains default `opendaylight` class param values.
+- `::opendaylight::install`: Installs ODL from an RPM or tarball.
+- `::opendaylight::config`: Manages ODL config, including Karaf features and
+  REST port.
+- `::opendaylight::service`: Starts the OpenDaylight service.
 
 ### `::opendaylight`
 
@@ -243,7 +272,7 @@ Default: `[]`
 
 Valid options: A list of Karaf feature names as strings.
 
-##### `install_method `
+##### `install_method`
 
 Specifies the install method by which to install OpenDaylight.
 
@@ -254,7 +283,7 @@ Default: `'rpm'`
 
 Valid options: The strings `'tarball'` or `'rpm'`.
 
-##### `odl_rest_port `
+##### `odl_rest_port`
 
 Specifies the port for the ODL northbound REST interface to listen on.
 
@@ -342,7 +371,7 @@ The ODL OVSDB Clustering and Jolokia XML for HA are configured and enabled.
 
 Specifies the IPs that are part of the HA cluster enabled by `enable_ha`.
 
-Default: []
+Default: \[]
 
 Valid options: An array of IP addresses `['10.10.10.1', '10.10.10.1', '10.10.10.3']`.
 
@@ -357,7 +386,6 @@ Default: ''
 Valid options: Index of a member of the array `ha_node_ips`: `0`.
 
 Required by: `enable_ha`, `ha_node_ips`
-
 
 ##### `tarball_url`
 
@@ -380,12 +408,20 @@ Default: `'https://github.com/dfarrell07/opendaylight-systemd/archive/master/ope
 Valid options: A valid URL to an ODL systemd .service file (archived in a
 tarball) as a string.
 
+##### `security_group_mode`
+
+Specifies the mode to use for security groups.
+
+Default: `stateful`
+
+Valid options: `transparent`, `learn`, `statless`
+
 ## Limitations
 
-* Tested on Fedora 22, 23, CentOS 7 and Ubuntu 14.04.
-* CentOS 7 is currently the most stable OS option.
-* The RPM install method is likely more reliable than the tarball install
-method.
+- Tested on Fedora 22, 23, CentOS 7 and Ubuntu 14.04.
+- CentOS 7 is currently the most stable OS option.
+- The RPM install method is likely more reliable than the tarball install
+  method.
 
 ## Development
 
@@ -399,22 +435,35 @@ OpenDaylight Puppet module.
 See the [CHANGELOG][15] or our [git tags][16] for information about releases.
 See our [git commit history][17] for contributor information.
 
-
 [1]: https://travis-ci.org/dfarrell07/puppet-opendaylight
+
 [2]: https://gemnasium.com/dfarrell07/puppet-opendaylight
-[3]: https://gitter.im/dfarrell07/puppet-opendaylight?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 [4]: https://travis-ci.org/dfarrell07/puppet-opendaylight.svg
+
 [5]: https://gemnasium.com/dfarrell07/puppet-opendaylight.svg
-[6]: https://badges.gitter.im/Join%20Chat.svg
+
 [7]: http://www.opendaylight.org/
+
 [8]: https://github.com/dfarrell07/puppet-opendaylight/blob/master/CONTRIBUTING.markdown#issues
+
 [9]: https://github.com/dfarrell07/opendaylight-systemd/
+
 [10]: https://github.com/dfarrell07/puppet-opendaylight/blob/master/files/upstart.odl.conf
+
 [11]: https://github.com/dfarrell07/vagrant-opendaylight/
+
 [12]: https://github.com/dfarrell07/vagrant-opendaylight/tree/master/manifests
+
 [13]: https://github.com/dfarrell07/puppet-opendaylight/issues/63
+
 [14]: https://github.com/dfarrell07/puppet-opendaylight/blob/master/CONTRIBUTING.markdown
+
 [15]: https://github.com/dfarrell07/puppet-opendaylight/blob/master/CHANGELOG
+
 [16]: https://github.com/dfarrell07/puppet-opendaylight/releases
+
 [17]: https://github.com/dfarrell07/puppet-opendaylight/commits/master
-[18]: http://cbs.centos.org/repos/nfv7-opendaylight-41-release/x86_64/os/Packages/
+
+[18]&#x3A; <http://cbs.centos.org/repos/nfv7-opendaylight-40-release/x86_64/os/Packages/> OpenDaylight Beryllium CentOS CBS repo
+[19]&#x3A; <https://wiki.opendaylight.org/view/Deployment#RPM> OpenDaylight RPMs and their repos

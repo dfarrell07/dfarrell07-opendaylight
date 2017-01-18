@@ -1,3 +1,4 @@
+---
 HOSTS:
   ubuntu-1404:
     roles:

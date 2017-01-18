@@ -14,12 +14,14 @@ custom_filters = [
   'Class[Java::Params]',
   'Class[Stdlib::Stages]',
   'Class[Stdlib]',
+  'Exec[Configure ODL OVSDB Clustering]',
   'Exec[download archive opendaylight.tar.gz and check sum]',
   'Exec[download archive opendaylight-systemd.tar.gz and check sum]',
   'Exec[opendaylight unpack]',
   'Exec[opendaylight-systemd unpack]',
   'Exec[rm-on-error-opendaylight.tar.gz]',
   'Exec[rm-on-error-opendaylight-systemd.tar.gz]',
+  'Exec[reload_systemd_units]',
   'Exec[update-java-alternatives]',
   'Package[curl]',
   'Stage[deploy]',
@@ -49,12 +51,12 @@ def generic_tests()
   it { should contain_class('opendaylight::service') }
 
   # Confirm relationships between classes
-  it { should contain_class('opendaylight::install').that_comes_before('opendaylight::config') }
-  it { should contain_class('opendaylight::config').that_requires('opendaylight::install') }
-  it { should contain_class('opendaylight::config').that_notifies('opendaylight::service') }
-  it { should contain_class('opendaylight::service').that_subscribes_to('opendaylight::config') }
-  it { should contain_class('opendaylight::service').that_comes_before('opendaylight') }
-  it { should contain_class('opendaylight').that_requires('opendaylight::service') }
+  it { should contain_class('opendaylight::install').that_comes_before('Class[opendaylight::config]') }
+  it { should contain_class('opendaylight::config').that_requires('Class[opendaylight::install]') }
+  it { should contain_class('opendaylight::config').that_notifies('Class[opendaylight::service]') }
+  it { should contain_class('opendaylight::service').that_subscribes_to('Class[opendaylight::config]') }
+  it { should contain_class('opendaylight::service').that_comes_before('Class[opendaylight]') }
+  it { should contain_class('opendaylight').that_requires('Class[opendaylight::service]') }
 
   # Confirm presence of generic resources
   it { should contain_service('opendaylight') }
@@ -210,7 +212,7 @@ def enable_l3_tests(options = {})
         'path'        => '/opt/opendaylight/etc/custom.properties',
         'owner'   => 'odl',
         'group'   => 'odl',
-        'content'     => /^ovsdb.l3.fwd.enabled=yes/
+        'content'     => /^ovsdb.l3.fwd.enabled=yes\novsdb.l3.arp.responder.disabled=no/
       )
     }
   elsif [false, 'no'].include? enable_l3
@@ -227,13 +229,41 @@ def enable_l3_tests(options = {})
   end
 end
 
+def enable_ha_tests(options = {})
+  # Extract params
+  enable_ha = options.fetch(:enable_ha, false)
+  ha_node_ips = options.fetch(:ha_node_ips, [])
+  ha_node_index = options.fetch(:ha_node_index, '')
+  # HA_NODE_IPS size
+  ha_node_count = ha_node_ips.size
+
+  if enable_ha
+    # Confirm ODL OVSDB HA is enabled
+    if ha_node_count >=2
+      # Check for HA_NODE_COUNT >= 2
+      it {
+        should contain_file('opendaylight/jolokia.xml').with(
+          'ensure'  => 'file',
+          'path'  => '/opt/opendaylight/deploy/jolokia.xml',
+          'owner' => 'odl',
+          'group' => 'odl'
+        )
+      }
+    else
+      # Check for HA_NODE_COUNT < 2
+      fail("Number of HA nodes less than 2: #{ha_node_count} and HA Enabled")
+    end
+  end
+end
+
 def tarball_install_tests(options = {})
   # Extract params
   # NB: These default values should be the same as ones in opendaylight::params
   # TODO: Remove this possible source of bugs^^
-  tarball_url = options.fetch(:tarball_url, 'https://nexus.opendaylight.org/content/repositories/opendaylight.release/org/opendaylight/integration/distribution-karaf/0.4.1-Beryllium-SR1/distribution-karaf-0.4.1-Beryllium-SR1.tar.gz')
+  tarball_url = options.fetch(:tarball_url, '')
   unitfile_url = options.fetch(:unitfile_url, 'https://github.com/dfarrell07/opendaylight-systemd/archive/master/opendaylight-unitfile.tar.gz')
   osfamily = options.fetch(:osfamily, 'RedHat')
+  rpm_repo = options.fetch(:rpm_repo, 'opendaylight-5-testing')
 
   # Confirm presence of tarball-related resources
   it { should contain_archive('opendaylight') }
@@ -355,48 +385,47 @@ def tarball_install_tests(options = {})
   end
 
   # Verify that there are no unexpected resources from RPM-type installs
-  it { should_not contain_yumrepo('opendaylight-41-release') }
+  it { should_not contain_yumrepo(rpm_repo) }
   it { should_not contain_package('opendaylight') }
 end
 
 def rpm_install_tests(options = {})
   # Extract params
-  # Choose Yum URL based on OS (CentOS vs Fedora)
-  # NB: Currently using the CentOS CBS for both Fedora and CentOS
-  operatingsystem  = options.fetch(:operatingsystem, 'CentOS')
-  case operatingsystem
-  when 'CentOS'
-    yum_repo = 'http://cbs.centos.org/repos/nfv7-opendaylight-41-release/$basearch/os/'
-  when 'Fedora'
-    yum_repo = 'http://cbs.centos.org/repos/nfv7-opendaylight-41-release/$basearch/os/'
-  else
-    fail("Unknown operatingsystem: #{operatingsystem}")
-  end
+  rpm_repo = options.fetch(:rpm_repo, 'opendaylight-5-testing')
 
   # Default to CentOS 7 Yum repo URL
 
   # Confirm presence of RPM-related resources
-  it { should contain_yumrepo('opendaylight-41-release') }
+  it { should contain_yumrepo(rpm_repo) }
   it { should contain_package('opendaylight') }
 
   # Confirm relationships between RPM-related resources
-  it { should contain_package('opendaylight').that_requires('Yumrepo[opendaylight-41-release]') }
-  it { should contain_yumrepo('opendaylight-41-release').that_comes_before('Package[opendaylight]') }
+  it { should contain_package('opendaylight').that_requires("Yumrepo[#{rpm_repo}]") }
+  it { should contain_yumrepo(rpm_repo).that_comes_before('Package[opendaylight]') }
 
   # Confirm properties of RPM-related resources
   # NB: These hashes don't work with Ruby 1.8.7, but we
   #   don't support 1.8.7 so that's okay. See issue #36.
   it {
-    should contain_yumrepo('opendaylight-41-release').with(
+    should contain_yumrepo(rpm_repo).with(
       'enabled'     => '1',
       'gpgcheck'    => '0',
-      'descr'       => 'CentOS CBS OpenDaylight Berillium testing repository',
-      'baseurl'     => yum_repo,
+      'descr'       => 'OpenDaylight SDN Controller',
+      'baseurl'     => "http://cbs.centos.org/repos/nfv7-#{rpm_repo}/$basearch/os/",
     )
   }
   it {
     should contain_package('opendaylight').with(
       'ensure'   => 'present',
+    )
+  }
+
+  it {
+    should contain_file_line('odl_start_ipv4').with(
+      'ensure' => 'present',
+      'path' => '/usr/lib/systemd/system/opendaylight.service',
+      'line' => 'Environment=_JAVA_OPTIONS=\'-Djava.net.preferIPv4Stack=true\'',
+      'after' => 'ExecStart=/opt/opendaylight/bin/start',
     )
   }
 end
@@ -405,6 +434,7 @@ end
 def unsupported_os_tests(options = {})
   # Extract params
   expected_msg = options.fetch(:expected_msg)
+  rpm_repo = options.fetch(:rpm_repo, 'opendaylight-5-testing')
 
   # Confirm that classes fail on unsupported OSs
   it { expect { should contain_class('opendaylight') }.to raise_error(Puppet::Error, /#{expected_msg}/) }
@@ -413,8 +443,44 @@ def unsupported_os_tests(options = {})
   it { expect { should contain_class('opendaylight::service') }.to raise_error(Puppet::Error, /#{expected_msg}/) }
 
   # Confirm that other resources fail on unsupported OSs
-  it { expect { should contain_yumrepo('opendaylight-41-release') }.to raise_error(Puppet::Error, /#{expected_msg}/) }
+  it { expect { should contain_yumrepo(rpm_repo) }.to raise_error(Puppet::Error, /#{expected_msg}/) }
   it { expect { should contain_package('opendaylight') }.to raise_error(Puppet::Error, /#{expected_msg}/) }
   it { expect { should contain_service('opendaylight') }.to raise_error(Puppet::Error, /#{expected_msg}/) }
   it { expect { should contain_file('org.apache.karaf.features.cfg') }.to raise_error(Puppet::Error, /#{expected_msg}/) }
+end
+
+# Shared tests that specialize in testing security group mode
+def enable_sg_tests(sg_mode='stateful', os_release)
+  # Extract params
+  # NB: This default value should be the same as one in opendaylight::params
+  # TODO: Remove this possible source of bugs^^
+
+  it { should contain_file('/opt/opendaylight/etc/opendaylight') }
+  it { should contain_file('/opt/opendaylight/etc/opendaylight/datastore')}
+  it { should contain_file('/opt/opendaylight/etc/opendaylight/datastore/initial')}
+  it { should contain_file('/opt/opendaylight/etc/opendaylight/datastore/initial/config')}
+
+  if os_release != '7.3' and sg_mode == 'stateful'
+    # Confirm sg_mode becomes learn
+    it {
+      should contain_file('netvirt-aclservice-config.xml').with(
+        'ensure'      => 'file',
+        'path'        => '/opt/opendaylight/etc/opendaylight/datastore/initial/config/netvirt-aclservice-config.xml',
+        'owner'   => 'odl',
+        'group'   => 'odl',
+        'content'     => /learn/
+      )
+    }
+  else
+    # Confirm other sg_mode is passed correctly
+    it {
+      should contain_file('netvirt-aclservice-config.xml').with(
+        'ensure'      => 'file',
+        'path'        => '/opt/opendaylight/etc/opendaylight/datastore/initial/config/netvirt-aclservice-config.xml',
+        'owner'   => 'odl',
+        'group'   => 'odl',
+        'content'     => /#{sg_mode}/
+      )
+    }
+  end
 end

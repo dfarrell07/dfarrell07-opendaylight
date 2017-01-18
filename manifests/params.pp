@@ -13,11 +13,13 @@ class opendaylight::params {
   $odl_rest_port = '8080'
   $odl_bind_ip = '0.0.0.0'
   $install_method = 'rpm'
-  $tarball_url = 'https://nexus.opendaylight.org/content/repositories/opendaylight.release/org/opendaylight/integration/distribution-karaf/0.4.1-Beryllium-SR1/distribution-karaf-0.4.1-Beryllium-SR1.tar.gz'
+  $rpm_repo = 'opendaylight-5-testing'
+  $tarball_url = ''
   $unitfile_url = 'https://github.com/dfarrell07/opendaylight-systemd/archive/master/opendaylight-unitfile.tar.gz'
   $enable_l3 = 'no'
   $log_levels = {}
   $enable_ha = false
   $ha_node_ips = []
   $ha_node_index = ''
+  $security_group_mode = 'stateful'
 }

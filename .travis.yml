@@ -3,33 +3,27 @@ language: ruby
 bundler_args: --without local_only
 before_install: rm Gemfile.lock || true
 rvm:
-  - 1.9.3
-  - 2.0.0
   - 2.1.7
   - 2.2.3
+  - 2.2.6
+  - 2.3.1
 script: bundle exec rake test
 env:
-  - PUPPET_VERSION="~> 3.4.0"
-  - PUPPET_VERSION="~> 3.5.0"
-  - PUPPET_VERSION="~> 3.6.0"
-  - PUPPET_VERSION="~> 3.7.0"
-  - PUPPET_VERSION="~> 4.0.0"
-  - PUPPET_VERSION="~> 4.1.0"
-  - PUPPET_VERSION="~> 4.2.0"
+  - PUPPET_VERSION="~> 3.8.0"
   - PUPPET_VERSION="~> 4.3.0"
+  - PUPPET_VERSION="~> 4.5.0"
+  - PUPPET_VERSION="~> 4.8.0"
 matrix:
   exclude:
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.4.0"
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.5.0"
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.6.0"
-  - rvm: 2.2.3
-    env: PUPPET_VERSION="~> 3.7.0"
+    - rvm: 2.2.3
+      env: PUPPET_VERSION="~> 3.8.0"
+    - rvm: 2.2.6
+      env: PUPPET_VERSION="~> 3.8.0"
+    - rvm: 2.3.1
+      env: PUPPET_VERSION="~> 3.8.0"
 notifications:
-    email:
-        recipients:
-            - dfarrell@redhat.com
-    on_success: change
-    on_failure: change
+  email:
+    recipients:
+      - dfarrell@redhat.com
+  on_success: change
+  on_failure: change

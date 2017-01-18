@@ -1,0 +1,30 @@
+[Default]
+ignore = .gitignore
+use_spaces = True
+
+[markdown]
+bears = MarkdownBear
+files = ./**/*.markdown, ./**/*.md
+default_actions = MarkdownBear: ApplyPatchAction
+
+[json]
+bears = JSONFormatBear
+files = ./**/*.json
+default_actions = JSONFormatBear: ApplyPatchAction
+
+[ruby]
+bears = RuboCopBear
+files = ./**/*.rb
+
+[puppet]
+bears = PuppetLintBear
+files = ./**/*.pp
+
+[xml]
+bears = XMLBear
+files = ./**/*.xml
+
+[yaml]
+bears = YAMLLintBear
+yamllint_config = .yamllint
+files = ./**/*.yaml, ./**/*.yml

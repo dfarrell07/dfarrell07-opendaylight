@@ -35,8 +35,12 @@ exclude_paths = [
 PuppetLint.configuration.ignore_paths = exclude_paths
 PuppetSyntax.exclude_paths = exclude_paths
 
-task :metadata do
+task :metadata_lint do
   sh "metadata-json-lint metadata.json"
+end
+
+task :travis_lint do
+  sh "travis lint .travis.yml"
 end
 
 desc "Run syntax, lint, and spec tests."
@@ -44,12 +48,22 @@ task :test => [
   :syntax,
   :lint,
   :spec,
-  :metadata,
+  :metadata_lint,
 ]
 
-desc "Run Beaker tests against CentOS 7 node."
-task :centos do
-  sh "RS_SET=centos-7 INSTALL_METHOD=rpm bundle exec rake beaker"
+desc "Run Beaker tests against CentOS 7 with latest Beryllium RPM"
+task :centos_odl4testing do
+  sh "RS_SET=centos-7 INSTALL_METHOD=rpm RPM_REPO='opendaylight-4-testing' bundle exec rake beaker"
+end
+
+desc "Run Beaker tests against CentOS 7 with Beryllium SR2 4.2."
+task :centos_odl42 do
+  sh "RS_SET=centos-7 INSTALL_METHOD=rpm RPM_REPO='opendaylight-42-release' bundle exec rake beaker"
+end
+
+desc "Run Beaker tests against CentOS 7 with Beryllium 4.0."
+task :centos_odl40 do
+  sh "RS_SET=centos-7 INSTALL_METHOD=rpm RPM_REPO='opendaylight-40-release' bundle exec rake beaker"
 end
 
 desc "Run Beaker tests against CentOS 7 using tarball install."
@@ -61,13 +75,18 @@ end
 # the actually-functional systemd-container installed on centos:7
 # https://github.com/CentOS/sig-cloud-instance-build/commit/3bf1e7bbf14deaa8c047c1dfbead6d0e8d0665f2
 desc "Run Beaker tests against CentOS 7 Docker node."
-task :centos_7_docker do
+task :centos_docker do
   sh "RS_SET=centos-7-docker INSTALL_METHOD=rpm bundle exec rake beaker"
 end
 
 desc "Run Beaker tests against Fedora 22 node."
 task :fedora_22 do
   sh "RS_SET=fedora-22 INSTALL_METHOD=rpm bundle exec rake beaker"
+end
+
+desc "Run Beaker tests against Fedora 23 node."
+task :fedora_23 do
+  sh "RS_SET=fedora-23 INSTALL_METHOD=rpm bundle exec rake beaker"
 end
 
 desc "Run Beaker tests against Fedora 23 Docker node."

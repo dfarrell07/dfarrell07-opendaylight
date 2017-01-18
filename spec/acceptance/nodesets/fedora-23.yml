@@ -1,0 +1,13 @@
+---
+HOSTS:
+  fedora-23:
+    roles:
+      - master
+    platform: fedora-23-x86_64
+    box: fedora/23-cloud-base
+    box_url: https://atlas.hashicorp.com/fedora/boxes/23-cloud-base
+    hypervisor: vagrant
+
+CONFIG:
+  log_level: verbose
+  type: foss

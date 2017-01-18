@@ -46,28 +46,40 @@ end
 #   http://serverspec.org/resource_types.html
 
 def install_odl(options = {})
+  # Install params are passed via environment var, set in Rakefile
+  # Changing the installed version of ODL via `puppet apply` is not supported
+  # by puppet-odl, so it's not possible to vary these params in the same
+  # Beaker test run. Do a different run passing different env vars.
+  install_method = ENV['INSTALL_METHOD']
+  rpm_repo = ENV['RPM_REPO']
+
   # NB: These param defaults should match the ones used by the opendaylight
   #   class, which are defined in opendaylight::params
   # TODO: Remove this possible source of bugs^^
   # Extract params if given, defaulting to odl class defaults if not
-  # Default install method is passed via environment var, set in Rakefile
-  install_method = options.fetch(:install_method, ENV['INSTALL_METHOD'])
   extra_features = options.fetch(:extra_features, [])
   default_features = options.fetch(:default_features,
     ['config', 'standard', 'region', 'package', 'kar', 'ssh', 'management'])
   odl_rest_port = options.fetch(:odl_rest_port, 8080)
   log_levels = options.fetch(:log_levels, {})
   enable_l3 = options.fetch(:enable_l3, 'no')
+  enable_ha = options.fetch(:enable_ha, false)
+  ha_node_ips = options.fetch(:ha_node_ips, [])
+  ha_node_index = options.fetch(:ha_node_index, '')
 
   # Build script for consumption by Puppet apply
   it 'should work idempotently with no errors' do
     pp = <<-EOS
     class { 'opendaylight':
       install_method => #{install_method},
+      rpm_repo => #{rpm_repo},
       default_features => #{default_features},
       extra_features => #{extra_features},
       odl_rest_port=> #{odl_rest_port},
       enable_l3=> #{enable_l3},
+      enable_ha=> #{enable_ha},
+      ha_node_ips=> #{ha_node_ips},
+      ha_node_index=> #{ha_node_index},
       log_levels=> #{log_levels},
     }
     EOS
@@ -75,13 +87,12 @@ def install_odl(options = {})
     # Apply our Puppet manifest on the Beaker host
     apply_manifest(pp, :catch_failures => true)
 
-    # The tarball extract isn't idempotent, can't do this check
-    # See: https://github.com/dfarrell07/puppet-opendaylight/issues/45#issuecomment-78135725
-    if install_method != 'tarball'
-      # Run it twice to test for idempotency
-      apply_manifest(pp, :catch_changes  => true)
+    # Not checking for idempotence because of false failures
+    # related to package manager cache updates outputting to
+    # stdout and different IDs for the puppet manifest apply.
+    # I think this is a limitation in how Beaker can check
+    # for changes, not a problem with the Puppet module.
     end
-  end
 end
 
 # Shared function that handles generic validations
@@ -158,7 +169,7 @@ def generic_validations()
     it { should be_grouped_into 'odl' }
   end
 
-  if ['centos-7', 'centos-7-docker', 'fedora-22', 'fedora-23-docker'].include? ENV['RS_SET']
+  if ['centos-7', 'centos-7-docker', 'fedora-22', 'fedora-23', 'fedora-23-docker'].include? ENV['RS_SET']
     # Validations for modern Red Hat family OSs
 
     # Verify ODL systemd .service file
@@ -288,7 +299,7 @@ def enable_l3_validations(options = {})
       it { should be_file }
       it { should be_owned_by 'odl' }
       it { should be_grouped_into 'odl' }
-      its(:content) { should match /^ovsdb.l3.fwd.enabled=yes/ }
+      its(:content) { should match /^ovsdb.l3.fwd.enabled=yes\novsdb.l3.arp.responder.disabled=no/ }
     end
   elsif [false, 'no'].include? enable_l3
     # Confirm ODL OVSDB L3 is disabled
@@ -301,9 +312,38 @@ def enable_l3_validations(options = {})
   end
 end
 
+# Shared function for validations related to ODL OVSDB HA config
+def enable_ha_validations(options = {})
+  # NB: This param default should match the one used by the opendaylight
+  #   class, which is defined in opendaylight::params
+  # TODO: Remove this possible source of bugs^^
+  enable_ha = options.fetch(:enable_ha, false)
+  ha_node_ips = options.fetch(:ha_node_ips, [])
+  ha_node_index = options.fetch(:ha_node_index, '')
+  # HA_NODE_IPS size
+  ha_node_count = ha_node_ips.size
+
+  if enable_ha
+    # Confirm ODL OVSDB HA is enabled
+    if ha_node_count >=2
+      # Check for HA_NODE_COUNT >= 2
+      describe file('/opt/opendaylight/deploy/jolokia.xml') do
+      it { should be_file }
+      it { should be_owned_by 'odl' }
+      it { should be_grouped_into 'odl' }
+    end
+    else
+      # Check for HA_NODE_COUNT < 2
+      fail("Number of HA nodes less than 2: #{ha_node_count} and HA Enabled")
+    end
+  end
+end
+
 # Shared function that handles validations specific to RPM-type installs
 def rpm_validations()
-  describe yumrepo('opendaylight-41-release') do
+  rpm_repo = ENV['RPM_REPO']
+
+  describe yumrepo(rpm_repo) do
     it { should exist }
     it { should be_enabled }
   end
@@ -315,13 +355,15 @@ end
 
 # Shared function that handles validations specific to tarball-type installs
 def tarball_validations()
+  rpm_repo = ENV['RPM_REPO']
+
   describe package('opendaylight') do
     it { should_not be_installed }
   end
 
   # Repo checks break (not fail) when yum doesn't make sense (Ubuntu)
-  if ['centos-7', 'fedora-22', 'fedora-23-docker'].include? ENV['RS_SET']
-    describe yumrepo('opendaylight-41-release') do
+  if ['centos-7', 'fedora-22', 'fedora-23', 'fedora-23-docker'].include? ENV['RS_SET']
+    describe yumrepo(rpm_repo) do
       it { should_not exist }
       it { should_not be_enabled }
     end
