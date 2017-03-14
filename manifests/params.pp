@@ -14,6 +14,7 @@ class opendaylight::params {
   $odl_bind_ip = '0.0.0.0'
   $rpm_repo = 'opendaylight-5-testing'
   $deb_repo = 'ppa:odl-team/boron'
+  $rpm_repo_gpgcheck = 0
   $log_levels = {}
   $enable_ha = false
   $ha_node_ips = []

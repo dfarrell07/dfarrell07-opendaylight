@@ -25,7 +25,8 @@ class opendaylight::repos (
   $deb_repo          = $::opendaylight::deb_repo,
   $rpm_repo          = $::opendaylight::rpm_repo,
   $rpm_repo_enabled  = 1,
-  $rpm_repo_gpgcheck = 0,
+  $rpm_repo_gpgcheck = $::opendaylight::rpm_repo_gpgcheck,
+  $baseurl = $::opendaylight::baseurl,
 ) inherits ::opendaylight {
   if $::osfamily == 'RedHat' {
     # Add OpenDaylight's Yum repository
@@ -34,7 +35,7 @@ class opendaylight::repos (
       # Seems to default to present, but docs don't say
       # https://docs.puppetlabs.com/references/3.4.0/type.html#yumrepo
       # https://docs.puppetlabs.com/references/3.5.0/type.html#yumrepo
-      baseurl  => "http://cbs.centos.org/repos/nfv7-${rpm_repo}/\$basearch/os/",
+      baseurl  => $baseurl,
       descr    => 'OpenDaylight SDN Controller',
       enabled  => $rpm_repo_enabled,
       # NB: RPM signing is an active TODO, but is not done. We will enable
