@@ -15,6 +15,10 @@
 # [*rpm_repo*]
 #   OpenDaylight CentOS CBS repo to install RPM from (opendaylight-4-testing,
 #   opendaylight-40-release, ...).
+# [*baseurl*]
+#   The Yum repository URL that holds the OpenDaylight RPM
+# [*rpm_repo_gpgcheck*]
+#   Enable or disable GPG check for the RPM repository
 # [*deb_repo*]
 #   OpenDaylight Launchpad PPA repo to install .deb from (ppa:odl-team/boron,
 #   ppa:odl-team/carbon, ...).
@@ -44,6 +48,8 @@ class opendaylight (
   $odl_rest_port       = $::opendaylight::params::odl_rest_port,
   $odl_bind_ip         = $::opendaylight::params::odl_bind_ip,
   $rpm_repo            = $::opendaylight::params::rpm_repo,
+  $baseurl             = "http://cbs.centos.org/repos/nfv7-${rpm_repo}/\$basearch/os/",
+  $rpm_repo_gpgcheck   = $::opendaylight::params::rpm_repo_gpgcheck,
   $deb_repo            = $::opendaylight::params::deb_repo,
   $log_levels          = $::opendaylight::params::log_levels,
   $enable_ha           = $::opendaylight::params::enable_ha,

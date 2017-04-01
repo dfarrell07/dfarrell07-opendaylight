@@ -134,6 +134,22 @@ For a full list of OpenDaylight releases and their CBS repos, see the
 This is only read for RedHat based operating systems. For Debian based OSs,
 this values is `none`.
 
+It's also possible to use the baseurl parameter to have a custom repository.
+
+```puppet
+class { 'opendaylight':
+  rpm_repo => 'opendaylight-5-testing',
+  baseurl => 'http://cbs.centos.org/repos/nfv7-opendaylight-5-testing/$basearch/os/'
+}
+```
+To disable the repository (For example when a repository for OpenDaylight already exists) use:
+
+```puppet
+class { 'opendaylight':
+  manage_repositories => false,
+}
+```
+
 ### Deb Repo
 
 The `deb_repo` param can be used to configure which Deb repository

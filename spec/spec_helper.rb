@@ -217,6 +217,8 @@ def rpm_install_tests(options = {})
   # Extract params
   rpm_repo = options.fetch(:rpm_repo, 'opendaylight-6-testing')
   java_opts = options.fetch(:java_opts, '-Djava.net.preferIPv4Stack=true')
+  baseurl = options.fetch(:baseurl, "http://cbs.centos.org/repos/nfv7-#{rpm_repo}/$basearch/os/")
+  enable_repo = options.fetch(:enable_repo, '1')
 
   # Default to CentOS 7 Yum repo URL
 
@@ -233,10 +235,10 @@ def rpm_install_tests(options = {})
   #   don't support 1.8.7 so that's okay. See issue #36.
   it {
     should contain_yumrepo(rpm_repo).with(
-      'enabled'     => '1',
+      'enabled'     => "#{enable_repo}",
       'gpgcheck'    => '0',
       'descr'       => 'OpenDaylight SDN Controller',
-      'baseurl'     => "http://cbs.centos.org/repos/nfv7-#{rpm_repo}/$basearch/os/",
+      'baseurl'     => "#{baseurl}",
     )
   }
   it {
