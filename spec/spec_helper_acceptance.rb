@@ -71,6 +71,8 @@ def install_odl(options = {})
   enable_ha = options.fetch(:enable_ha, false)
   ha_node_ips = options.fetch(:ha_node_ips, [])
   ha_node_index = options.fetch(:ha_node_index, 0)
+  username = options.fetch(:username, 'admin')
+  password = options.fetch(:password, 'admin')
 
   # Build script for consumption by Puppet apply
   it 'should work idempotently with no errors' do
@@ -85,6 +87,8 @@ def install_odl(options = {})
       ha_node_ips=> #{ha_node_ips},
       ha_node_index=> #{ha_node_index},
       log_levels=> #{log_levels},
+      username=> #{username},
+      password=> #{password},
     }
     EOS
 
@@ -328,5 +332,23 @@ def deb_validations()
 
   describe package('opendaylight') do
     it { should be_installed }
+  end
+end
+
+# Shared function for validations related to username/password
+def username_password_validations(options = {})
+  # NB: This param default should match the one used by the opendaylight
+  #   class, which is defined in opendaylight::params
+  # TODO: Remove this possible source of bugs^^
+  odl_username = options.fetch(:username, 'admin')
+  odl_password = options.fetch(:password, 'admin')
+  odl_check_url = 'http://127.0.0.1:8080/restconf'
+
+  describe file('/opt/opendaylight/idmlight.db.mv.db') do
+    it { should be_file }
+  end
+
+  describe command("sleep 60 && curl -o /dev/null --fail --silent --head -u #{odl_username}:#{odl_password} #{odl_check_url}") do
+    its(:exit_status) { should eq 0 }
   end
 end

@@ -122,4 +122,16 @@ describe 'opendaylight class' do
       log_level_validations(log_levels: custom_log_levels)
     end
   end
+
+  describe 'testing odl username/password' do
+    context 'using default username/password' do
+    context 'using default log levels' do
+      # Call specialized helper fn to install OpenDaylight
+      install_odl({:extra_features => ['odl-restconf']})
+
+      # Call specialized helper fn for username/password validations
+      username_password_validations
+    end
+    end
+  end
 end

@@ -22,4 +22,6 @@ class opendaylight::params {
   $vpp_routing_node = ''
   $java_opts = '-Djava.net.preferIPv4Stack=true'
   $manage_repositories = true
+  $username = 'admin'
+  $password = 'admin'
 }

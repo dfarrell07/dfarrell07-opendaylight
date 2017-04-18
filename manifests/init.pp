@@ -53,6 +53,8 @@ class opendaylight (
   $vpp_routing_node    = $::opendaylight::params::vpp_routing_node,
   $java_opts           = $::opendaylight::params::java_opts,
   $manage_repositories = $::opendaylight::params::manage_repositories,
+  $username            = $::opendaylight::params::username,
+  $password            = $::opendaylight::params::password,
 ) inherits ::opendaylight::params {
 
   # Validate OS family

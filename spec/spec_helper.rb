@@ -361,3 +361,13 @@ def vpp_routing_node_tests(options = {})
     }
   end
 end
+
+# ODL username/password tests
+def username_password_tests(username, password)
+
+  it {
+    should contain_odl_user(username).with(
+      :password => password
+    )
+  }
+end

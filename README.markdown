@@ -346,6 +346,22 @@ Default: `'-Djava.net.preferIPv4Stack=true'`
 
 Valid options: A string of valid Java options.
 
+##### `username`
+
+Specifies the username to set for admin role in ODL.
+
+Default: `'admin'`
+
+Valid options: A username string.
+
+##### `password`
+
+Specifies the password to set for admin role in ODL.
+
+Default: `'admin'`
+
+Valid options: A password string.
+
 ## Limitations
 
 - Tested on CentOS 7 and Ubuntu 16.04.

@@ -733,4 +733,52 @@ describe 'opendaylight' do
     end
   end
 
+  # ODL username/password tests
+  describe 'ODL username/password tests' do
+    # Non-OS-type tests assume CentOS 7
+    #   See issue #43 for reasoning:
+    #   https://github.com/dfarrell07/puppet-opendaylight/issues/43#issue-57343159
+    osfamily = 'RedHat'
+    operatingsystem = 'CentOS'
+    operatingsystemmajrelease = '7'
+    context 'using default username/password' do
+      let(:facts) {{
+        :osfamily => osfamily,
+        :operatingsystem => operatingsystem,
+        :operatingsystemmajrelease => operatingsystemmajrelease,
+      }}
+
+      let(:params) {{ }}
+
+      # Run shared tests applicable to all supported OSs
+      # Note that this function is defined in spec_helper
+      generic_tests
+
+      # Run test that specialize in checking username/password config
+      # Note that this function is defined in spec_helper
+      username_password_tests('admin','admin')
+    end
+
+    context 'specifying non-default username/password' do
+      let(:facts) {{
+        :osfamily => osfamily,
+        :operatingsystem => operatingsystem,
+        :operatingsystemmajrelease => operatingsystemmajrelease,
+      }}
+
+      let(:params) {{
+        :username => 'test',
+        :password => 'test'
+      }}
+
+      # Run shared tests applicable to all supported OSs
+      # Note that this function is defined in spec_helper
+      generic_tests
+
+      # Run test that specialize in checking routing-node config
+      # Note that this function is defined in spec_helper
+      username_password_tests('test', 'test')
+    end
+  end
+
 end
