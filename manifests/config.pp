@@ -95,14 +95,14 @@ class opendaylight::config {
 
   #configure VPP routing node
   if ! empty($::opendaylight::vpp_routing_node) {
-    file { 'org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg':
+    file { 'org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg':
       ensure => file,
-      path   => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg',
+      path   => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg',
       owner  => 'odl',
       group  => 'odl',
     }
     file_line { 'routing-node':
-      path  => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg',
+      path  => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg',
       line  => "routing-node=${::opendaylight::vpp_routing_node}",
       match => '^routing-node=.*$',
     }

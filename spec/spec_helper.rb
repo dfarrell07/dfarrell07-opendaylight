@@ -338,23 +338,23 @@ def vpp_routing_node_tests(options = {})
   routing_node = options.fetch(:routing_node, '')
 
   if routing_node.empty?
-    it { should_not contain_file('org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg') }
+    it { should_not contain_file('org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg') }
     it { should_not contain_file_line('routing-node') }
   else
     # Confirm properties of Karaf config file
     # NB: These hashes don't work with Ruby 1.8.7, but we
     #   don't support 1.8.7 so that's okay. See issue #36.
     it {
-      should contain_file('org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg').with(
+      should contain_file('org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg').with(
         'ensure'      => 'file',
-        'path'        => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg',
+        'path'        => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg',
         'owner'   => 'odl',
         'group'   => 'odl',
       )
     }
     it {
       should contain_file_line('routing-node').with(
-        'path'  => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg',
+        'path'  => '/opt/opendaylight/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg',
         'line'  => "routing-node=#{routing_node}",
         'match' => '^routing-node=.*$',
       )

@@ -332,7 +332,7 @@ Valid options: `transparent`, `learn`, `stateless`
 ##### `vpp_routing_node`
 
 Specifies the routing node for VPP deployment. A non-empty string will create config file
-org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.cfg with routing-node set.
+org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg with routing-node set.
 
 Default: `''`
 
